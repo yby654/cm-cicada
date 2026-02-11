@@ -9,9 +9,9 @@ import (
 	"syscall"
 
 	"github.com/cloud-barista/cm-cicada/common"
-	"github.com/cloud-barista/cm-cicada/db"
-	"github.com/cloud-barista/cm-cicada/lib/airflow"
-	"github.com/cloud-barista/cm-cicada/lib/config"
+	"github.com/cloud-barista/cm-cicada/internal/db"
+	"github.com/cloud-barista/cm-cicada/internal/lib/airflow"
+	"github.com/cloud-barista/cm-cicada/internal/lib/config"
 	"github.com/cloud-barista/cm-cicada/pkg/api/rest/controller"
 	"github.com/cloud-barista/cm-cicada/pkg/api/rest/server"
 	"github.com/jollaman999/utils/logger"

@@ -1,7 +1,48 @@
 import os
 import airflow
 from gusty import create_dag
+from airflow.providers.http.hooks.http import HttpHook
 from airflow.utils.state import State
+
+
+
+########################
+# cicada callback 먼저 #
+########################
+def cicada_workflowrun_callback(context):
+
+    dr = context["dag_run"]
+    wf_id = dr.dag_id
+    payload = {
+        "workflow_run_id": dr.run_id,
+        "workflow_id": dr.dag_id,
+        "execution_date": _dt(dr.execution_date),
+        "start_date": _dt(dr.start_date),
+        "end_date": _dt(dr.end_date),
+        "run_type": str(dr.run_type),
+        "state": dr.state
+    }
+
+    hook = HttpHook(
+        method="POST",
+        http_conn_id="cicada_api"
+    )
+
+    try:
+        hook.run(
+            endpoint="/cicada/workflow/{wf_id}/runs",
+            json=payload,
+            headers={"Content-Type": "application/json"}
+        )
+    except Exception as e:
+        print(f"[WARN] cicada workflow run report failed: {e}")
+
+
+def _dt(v):
+    return v.isoformat() if v else None
+
+
+
 
 #####################
 ## DAG Directories ##
@@ -16,25 +57,30 @@ dag_directories = [os.path.join(dag_parent_dir, name) for name in os.listdir(dag
 ####################
 ## DAG Generation ##
 ####################
-
-
 for dag_directory in dag_directories:
+
     dag_id = os.path.basename(dag_directory)
-    globals()[dag_id] = create_dag(dag_directory,
-                                   tags = ['default', 'tags'],
-                                   task_group_defaults={"tooltip": "default tooltip"},
-                                   wait_for_defaults={"retries": 10, "check_existence": True},
-                                   latest_only=False)
 
-                                   
-def collect_failed_tasks(**context):
-    dag_run = context['dag_run']
-    failed_tasks = []
+    dag = create_dag(
+        dag_directory,
+        tags=['default', 'tags'],
+        task_group_defaults={"tooltip": "default tooltip"},
+        wait_for_defaults={"retries": 10, "check_existence": True},
+        latest_only=False
+    )
 
-    for task_instance in dag_run.get_task_instances():
-        if task_instance.state == State.FAILED:
-            failed_tasks.append(task_instance.task_id)
+    # ✅ 전 DAG 공통 이력 적재
+    dag.on_success_callback = cicada_workflowrun_callback
+    dag.on_failure_callback = cicada_workflowrun_callback
 
-    # DAG 상태 및 실패한 작업 목록을 XCom에 푸시
-    context['ti'].xcom_push(key='dag_state', value=dag_run.get_state())
-    context['ti'].xcom_push(key='failed_tasks', value=failed_tasks)
+    globals()[dag_id] = dag
+
+# for dag_directory in dag_directories:
+#     dag_id = os.path.basename(dag_directory)
+#     globals()[dag_id] = create_dag(dag_directory,
+#                                    tags = ['default', 'tags'],
+#                                    task_group_defaults={"tooltip": "default tooltip"},
+#                                    wait_for_defaults={"retries": 10, "check_existence": True},
+#                                    latest_only=False)
+
+ 

@@ -10,11 +10,14 @@ import (
 
 func Workflow(e *echo.Echo) {
 	e.POST("/"+strings.ToLower(common.ShortModuleName)+"/workflow", controller.CreateWorkflow)
+	e.POST("/"+strings.ToLower(common.ShortModuleName)+"/workflow/tx", controller.CreateWorkflowTx)
 	e.GET("/"+strings.ToLower(common.ShortModuleName)+"/workflow/:wfId", controller.GetWorkflow)
 	e.GET("/"+strings.ToLower(common.ShortModuleName)+"/workflow/name/:wfName", controller.GetWorkflowByName)
 	e.GET("/"+strings.ToLower(common.ShortModuleName)+"/workflow", controller.ListWorkflow)
 	e.PUT("/"+strings.ToLower(common.ShortModuleName)+"/workflow/:wfId", controller.UpdateWorkflow)
+	e.PUT("/"+strings.ToLower(common.ShortModuleName)+"/workflow/:wfId/versioned", controller.UpdateWorkflowVersioned)
 	e.POST("/"+strings.ToLower(common.ShortModuleName)+"/workflow/:wfId/run", controller.RunWorkflow)
+	e.POST("/"+strings.ToLower(common.ShortModuleName)+"/workflow/:wfId/runs", controller.CreateWorkflowRun)
 	e.DELETE("/"+strings.ToLower(common.ShortModuleName)+"/workflow/:wfId", controller.DeleteWorkflow)
 
 	e.GET("/"+strings.ToLower(common.ShortModuleName)+"/workflow/:wfId/task_group", controller.ListTaskGroup)
@@ -26,7 +29,7 @@ func Workflow(e *echo.Echo) {
 
 	e.GET("/"+strings.ToLower(common.ShortModuleName)+"/workflow/:wfId/task/:taskId", controller.GetTask)
 
-	e.GET("/"+strings.ToLower(common.ShortModuleName)+"/task_group/:tgId", controller.GetTaskGroupDirectly)
+	// e.GET("/"+strings.ToLower(common.ShortModuleName)+"/task_group/:tgId", controller.GetTaskGroupDirectly)
 	e.GET("/"+strings.ToLower(common.ShortModuleName)+"/task/:taskId", controller.GetTaskDirectly)
 	e.GET("/"+strings.ToLower(common.ShortModuleName)+"/workflow/:wfId/workflowRun/:wfRunId/task/:taskId/taskTryNum/:taskTryNum/logs", controller.GetTaskLogs)
 	e.GET("/"+strings.ToLower(common.ShortModuleName)+"/workflow/:wfId/workflowRun/:wfRunId/task/:taskId/taskTryNum/:taskTryNum/logs/download", controller.GetTaskLogDownload)
@@ -36,7 +39,7 @@ func Workflow(e *echo.Echo) {
 	e.GET("/"+strings.ToLower(common.ShortModuleName)+"/workflow/:wfId/eventlogs", controller.GetEventLogs)
 	e.GET("/"+strings.ToLower(common.ShortModuleName)+"/importErrors", controller.GetImportErrors)
 	e.GET("/"+strings.ToLower(common.ShortModuleName)+"/workflow/:wfId/version", controller.ListWorkflowVersion)
-	e.GET("/"+strings.ToLower(common.ShortModuleName)+"/workflow/:wfId/version/:verId", controller.GetWorkflowVersion)
+	e.GET("/"+strings.ToLower(common.ShortModuleName)+"/workflow/version/:verId", controller.GetWorkflowVersion)
 	e.GET("/"+strings.ToLower(common.ShortModuleName)+"/workflow/:wfId/status", controller.GetWorkflowStatus)
 
 	e.POST("/"+strings.ToLower(common.ShortModuleName)+"/run_script", controller.RunScript)

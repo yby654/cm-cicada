@@ -1,64 +1,112 @@
 basePath: /cicada
 definitions:
-  airflow.ImportError:
-    properties:
-      filename:
-        description: The filename
-        type: string
-      import_error_id:
-        description: The import error ID.
-        type: integer
-      stack_trace:
-        description: The full stackstrace..
-        type: string
-      timestamp:
-        description: The time when this error was created.
-        type: string
-    type: object
-  airflow.ImportErrorCollection:
-    properties:
-      import_errors:
-        items:
-          $ref: '#/definitions/airflow.ImportError'
-        type: array
-      total_entries:
-        description: Count of objects in the current result set.
-        type: integer
-    type: object
-  airflow.InlineResponse200:
-    properties:
-      content:
-        type: string
-      continuation_token:
-        type: string
-    type: object
-  github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse:
+  common.ErrorResponse:
     properties:
       error:
         type: string
     type: object
-  github_com_cloud-barista_cm-cicada_pkg_api_rest_model.CreateDataReq:
+  domain.ParameterStructure:
+    properties:
+      properties:
+        additionalProperties:
+          $ref: '#/definitions/domain.PropertyDef'
+        type: object
+      required:
+        items:
+          type: string
+        type: array
+    type: object
+  domain.PropertyDef:
+    properties:
+      default: {}
+      description:
+        type: string
+      enum:
+        items:
+          type: string
+        type: array
+      example: {}
+      items:
+        $ref: '#/definitions/domain.PropertyDef'
+      properties:
+        additionalProperties:
+          $ref: '#/definitions/domain.PropertyDef'
+        type: object
+      required:
+        items:
+          type: string
+        type: array
+      type:
+        type: string
+    type: object
+  domain.TaskComponent:
+    properties:
+      created_at:
+        type: string
+      data:
+        $ref: '#/definitions/domain.TaskComponentData'
+      description:
+        type: string
+      id:
+        type: string
+      is_example:
+        type: boolean
+      name:
+        type: string
+      updated_at:
+        type: string
+    required:
+    - data
+    - id
+    - name
+    type: object
+  domain.TaskComponentData:
+    properties:
+      body_params:
+        $ref: '#/definitions/domain.ParameterStructure'
+      options:
+        $ref: '#/definitions/domain.TaskComponentOptions'
+      path_params:
+        $ref: '#/definitions/domain.ParameterStructure'
+      query_params:
+        $ref: '#/definitions/domain.ParameterStructure'
+    type: object
+  domain.TaskComponentOptions:
+    properties:
+      api_connection_id:
+        type: string
+      endpoint:
+        type: string
+      extra:
+        additionalProperties: true
+        type: object
+      method:
+        type: string
+      request_body:
+        type: string
+    type: object
+  model.CreateDataReq:
     properties:
       description:
         type: string
       task_groups:
         items:
-          $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.CreateTaskGroupReq'
+          $ref: '#/definitions/model.CreateTaskGroupReq'
         type: array
     required:
     - task_groups
     type: object
-  github_com_cloud-barista_cm-cicada_pkg_api_rest_model.CreateTaskComponentReq:
+  model.CreateTaskComponentReq:
     properties:
       data:
-        $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.TaskComponentData'
+        $ref: '#/definitions/domain.TaskComponentData'
       name:
         type: string
     required:
     - data
     - name
     type: object
-  github_com_cloud-barista_cm-cicada_pkg_api_rest_model.CreateTaskGroupReq:
+  model.CreateTaskGroupReq:
     properties:
       description:
         type: string
@@ -66,13 +114,13 @@ definitions:
         type: string
       tasks:
         items:
-          $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.CreateTaskReq'
+          $ref: '#/definitions/model.CreateTaskReq'
         type: array
     required:
     - name
     - tasks
     type: object
-  github_com_cloud-barista_cm-cicada_pkg_api_rest_model.CreateTaskReq:
+  model.CreateTaskReq:
     properties:
       dependencies:
         items:
@@ -100,10 +148,10 @@ definitions:
     - request_body
     - task_component
     type: object
-  github_com_cloud-barista_cm-cicada_pkg_api_rest_model.CreateWorkflowReq:
+  model.CreateWorkflowReq:
     properties:
       data:
-        $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.CreateDataReq'
+        $ref: '#/definitions/model.CreateDataReq'
       name:
         type: string
       spec_version:
@@ -112,18 +160,38 @@ definitions:
     - data
     - name
     type: object
-  github_com_cloud-barista_cm-cicada_pkg_api_rest_model.Data:
+  model.CreateWorkflowRunReq:
+    properties:
+      end_date:
+        type: string
+      execution_date:
+        type: string
+      run_type:
+        type: string
+      start_date:
+        type: string
+      state:
+        type: string
+      workflow_id:
+        type: string
+      workflow_run_id:
+        type: string
+    required:
+    - workflow_id
+    - workflow_run_id
+    type: object
+  model.Data:
     properties:
       description:
         type: string
       task_groups:
         items:
-          $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.TaskGroup'
+          $ref: '#/definitions/model.TaskGroup'
         type: array
     required:
     - task_groups
     type: object
-  github_com_cloud-barista_cm-cicada_pkg_api_rest_model.EventLog:
+  model.EventLog:
     properties:
       event:
         type: string
@@ -142,54 +210,21 @@ definitions:
       workflow_run_id:
         type: string
     type: object
-  github_com_cloud-barista_cm-cicada_pkg_api_rest_model.GetWorkflowTemplate:
+  model.ImportError:
     properties:
-      data:
-        $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.CreateDataReq'
-      name:
-        type: string
-      spec_version:
-        type: string
-    required:
-    - data
-    - name
-    - spec_version
-    type: object
-  github_com_cloud-barista_cm-cicada_pkg_api_rest_model.ParameterStructure:
-    properties:
-      properties:
-        additionalProperties:
-          $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.PropertyDef'
-        type: object
-      required:
-        items:
-          type: string
-        type: array
-    type: object
-  github_com_cloud-barista_cm-cicada_pkg_api_rest_model.PropertyDef:
-    properties:
-      default: {}
-      description:
-        type: string
-      enum:
-        items:
-          type: string
-        type: array
-      example: {}
-      items:
-        $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.PropertyDef'
-      properties:
-        additionalProperties:
-          $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.PropertyDef'
-        type: object
-      required:
-        items:
-          type: string
-        type: array
-      type:
+      error:
         type: string
     type: object
-  github_com_cloud-barista_cm-cicada_pkg_api_rest_model.RunScriptReq:
+  model.ImportErrorCollection:
+    properties:
+      import_errors:
+        items:
+          $ref: '#/definitions/model.ImportError'
+        type: array
+      total_entries:
+        type: integer
+    type: object
+  model.RunScriptReq:
     properties:
       content:
         description: Base64 encoded script content.
@@ -201,7 +236,7 @@ definitions:
       vm_id:
         type: string
     type: object
-  github_com_cloud-barista_cm-cicada_pkg_api_rest_model.ScriptResult:
+  model.ScriptResult:
     properties:
       error:
         type: string
@@ -210,120 +245,19 @@ definitions:
       output:
         type: string
     type: object
-  github_com_cloud-barista_cm-cicada_pkg_api_rest_model.SimpleMsg:
+  model.SimpleMsg:
     properties:
       message:
         type: string
     type: object
-  github_com_cloud-barista_cm-cicada_pkg_api_rest_model.SleepTimeReq:
+  model.SleepTimeReq:
     properties:
       time:
         description: 'Ex: 300 = 300sec, 1m 30s = 1min 30seconds, 1h 10m 15s = 1hour
           10minutes 15seconds, 1d 1s = 1day 1second, No Input Default: 10s'
         type: string
     type: object
-  github_com_cloud-barista_cm-cicada_pkg_api_rest_model.Task:
-    properties:
-      dependencies:
-        items:
-          type: string
-        type: array
-      extra:
-        additionalProperties: true
-        type: object
-      id:
-        type: string
-      name:
-        type: string
-      path_params:
-        additionalProperties:
-          type: string
-        type: object
-      query_params:
-        additionalProperties:
-          type: string
-        type: object
-      request_body:
-        type: string
-      task_component:
-        type: string
-    required:
-    - id
-    - name
-    - request_body
-    - task_component
-    type: object
-  github_com_cloud-barista_cm-cicada_pkg_api_rest_model.TaskClearOption:
-    properties:
-      dryRun:
-        type: boolean
-      includeDownstream:
-        type: boolean
-      includeUpstream:
-        description: |-
-          IncludeFuture     bool     `json:"includeFuture"`
-          IncludeParentdag  bool     `json:"includeParentdag"`
-          IncludePast       bool     `json:"includePast"`
-          IncludeSubdags    bool     `json:"includeSubdags"`
-        type: boolean
-      onlyFailed:
-        type: boolean
-      onlyRunning:
-        type: boolean
-      resetDagRuns:
-        type: boolean
-      taskIds:
-        items:
-          type: string
-        type: array
-    type: object
-  github_com_cloud-barista_cm-cicada_pkg_api_rest_model.TaskComponent:
-    properties:
-      created_at:
-        type: string
-      data:
-        $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.TaskComponentData'
-      description:
-        type: string
-      id:
-        type: string
-      is_example:
-        type: boolean
-      name:
-        type: string
-      updated_at:
-        type: string
-    required:
-    - data
-    - id
-    - name
-    type: object
-  github_com_cloud-barista_cm-cicada_pkg_api_rest_model.TaskComponentData:
-    properties:
-      body_params:
-        $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.ParameterStructure'
-      options:
-        $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.TaskComponentOptions'
-      path_params:
-        $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.ParameterStructure'
-      query_params:
-        $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.ParameterStructure'
-    type: object
-  github_com_cloud-barista_cm-cicada_pkg_api_rest_model.TaskComponentOptions:
-    properties:
-      api_connection_id:
-        type: string
-      endpoint:
-        type: string
-      extra:
-        additionalProperties: true
-        type: object
-      method:
-        type: string
-      request_body:
-        type: string
-    type: object
-  github_com_cloud-barista_cm-cicada_pkg_api_rest_model.TaskDirectly:
+  model.Task:
     properties:
       dependencies:
         items:
@@ -360,7 +294,31 @@ definitions:
     - task_group_id
     - workflow_id
     type: object
-  github_com_cloud-barista_cm-cicada_pkg_api_rest_model.TaskGroup:
+  model.TaskClearOption:
+    properties:
+      dryRun:
+        type: boolean
+      includeDownstream:
+        type: boolean
+      includeUpstream:
+        description: |-
+          IncludeFuture     bool     `json:"includeFuture"`
+          IncludeParentdag  bool     `json:"includeParentdag"`
+          IncludePast       bool     `json:"includePast"`
+          IncludeSubdags    bool     `json:"includeSubdags"`
+        type: boolean
+      onlyFailed:
+        type: boolean
+      onlyRunning:
+        type: boolean
+      resetDagRuns:
+        type: boolean
+      taskIds:
+        items:
+          type: string
+        type: array
+    type: object
+  model.TaskGroup:
     properties:
       description:
         type: string
@@ -370,14 +328,17 @@ definitions:
         type: string
       tasks:
         items:
-          $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.Task'
+          $ref: '#/definitions/model.Task'
         type: array
+      workflow_id:
+        type: string
     required:
     - id
     - name
     - tasks
+    - workflow_id
     type: object
-  github_com_cloud-barista_cm-cicada_pkg_api_rest_model.TaskInstance:
+  model.TaskInstance:
     properties:
       duration_date:
         type: number
@@ -404,7 +365,7 @@ definitions:
       workflow_run_id:
         type: string
     type: object
-  github_com_cloud-barista_cm-cicada_pkg_api_rest_model.TaskInstanceReference:
+  model.TaskInstanceReference:
     properties:
       execution_date:
         type: string
@@ -420,12 +381,17 @@ definitions:
         description: The DAG run ID.
         type: string
     type: object
-  github_com_cloud-barista_cm-cicada_pkg_api_rest_model.Workflow:
+  model.TaskLog:
+    properties:
+      content:
+        type: string
+    type: object
+  model.Workflow:
     properties:
       created_at:
         type: string
       data:
-        $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.Data'
+        $ref: '#/definitions/model.Data'
       id:
         type: string
       name:
@@ -440,28 +406,15 @@ definitions:
     - name
     - spec_version
     type: object
-  github_com_cloud-barista_cm-cicada_pkg_api_rest_model.WorkflowRun:
+  model.WorkflowRun:
     properties:
-      conf:
-        additionalProperties: true
-        type: object
-      data_interval_end:
-        type: string
-      data_interval_start:
-        type: string
       duration_date:
         type: number
       end_date:
         type: string
       execution_date:
         type: string
-      external_trigger:
-        type: boolean
-      last_scheduling_decision:
-        type: string
-      logical_date:
-        type: string
-      note:
+      id:
         type: string
       run_type:
         type: string
@@ -471,51 +424,47 @@ definitions:
         type: string
       workflow_id:
         type: string
-      workflow_run_id:
-        type: string
     type: object
-  github_com_cloud-barista_cm-cicada_pkg_api_rest_model.WorkflowStatus:
+  model.WorkflowStatus:
     properties:
       count:
         type: integer
       state:
         type: string
     type: object
-  github_com_cloud-barista_cm-cicada_pkg_api_rest_model.WorkflowTemplate:
+  model.WorkflowTemplate:
     properties:
       data:
-        $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.CreateDataReq'
-      id:
-        type: string
+        $ref: '#/definitions/model.Data'
       name:
         type: string
       spec_version:
         type: string
     required:
     - data
-    - id
     - name
     - spec_version
     type: object
-  github_com_cloud-barista_cm-cicada_pkg_api_rest_model.WorkflowVersion:
+  model.WorkflowVersionSwg:
     properties:
-      action:
-        type: string
       created_at:
         type: string
-      data:
-        $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.Workflow'
+      definition_snapshot:
+        additionalProperties: true
+        type: object
       id:
         type: string
       spec_version:
         type: string
-      workflowId:
+      version:
+        type: integer
+      workflow_id:
         type: string
     required:
-    - action
     - id
     - spec_version
-    - workflowId
+    - version
+    - workflow_id
     type: object
 info:
   contact: {}
@@ -538,15 +487,15 @@ paths:
         "200":
           description: Successfully get the importErrors.
           schema:
-            $ref: '#/definitions/airflow.ImportErrorCollection'
+            $ref: '#/definitions/model.ImportErrorCollection'
         "400":
           description: Sent bad request.
           schema:
-            $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse'
+            $ref: '#/definitions/common.ErrorResponse'
         "500":
           description: Failed to get the importErrors.
           schema:
-            $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse'
+            $ref: '#/definitions/common.ErrorResponse'
       summary: Get importErrors
       tags:
       - '[Workflow]'
@@ -562,11 +511,11 @@ paths:
         "200":
           description: Successfully get ready state.
           schema:
-            $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.SimpleMsg'
+            $ref: '#/definitions/model.SimpleMsg'
         "500":
           description: Failed to check ready state.
           schema:
-            $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse'
+            $ref: '#/definitions/common.ErrorResponse'
       summary: Check Ready
       tags:
       - "[Admin]\tSystem management"
@@ -582,22 +531,22 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.RunScriptReq'
+          $ref: '#/definitions/model.RunScriptReq'
       produces:
       - application/json
       responses:
         "200":
           description: Result of the script running
           schema:
-            $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.ScriptResult'
+            $ref: '#/definitions/model.ScriptResult'
         "400":
           description: Sent bad request.
           schema:
-            $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse'
+            $ref: '#/definitions/common.ErrorResponse'
         "500":
           description: Failed to run script
           schema:
-            $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse'
+            $ref: '#/definitions/common.ErrorResponse'
       summary: Run script on target
       tags:
       - '[Cicada Task Component]'
@@ -614,22 +563,22 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.SleepTimeReq'
+          $ref: '#/definitions/model.SleepTimeReq'
       produces:
       - application/json
       responses:
         "200":
           description: Result of sleep
           schema:
-            $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.ScriptResult'
+            $ref: '#/definitions/model.ScriptResult'
         "400":
           description: Sent bad request.
           schema:
-            $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse'
+            $ref: '#/definitions/common.ErrorResponse'
         "500":
           description: Failed to run script
           schema:
-            $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse'
+            $ref: '#/definitions/common.ErrorResponse'
       summary: Run sleep command on cicada
       tags:
       - '[Cicada Task Component]'
@@ -651,15 +600,15 @@ paths:
         "200":
           description: Successfully get the task.
           schema:
-            $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.TaskDirectly'
+            $ref: '#/definitions/model.Task'
         "400":
           description: Sent bad request.
           schema:
-            $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse'
+            $ref: '#/definitions/common.ErrorResponse'
         "500":
           description: Failed to get the task.
           schema:
-            $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse'
+            $ref: '#/definitions/common.ErrorResponse'
       summary: Get Task Directly
       tags:
       - '[Workflow]'
@@ -685,16 +634,16 @@ paths:
           description: Successfully get a list of task component.
           schema:
             items:
-              $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.TaskComponent'
+              $ref: '#/definitions/domain.TaskComponent'
             type: array
         "400":
           description: Sent bad request.
           schema:
-            $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse'
+            $ref: '#/definitions/common.ErrorResponse'
         "500":
           description: Failed to get a list of task component.
           schema:
-            $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse'
+            $ref: '#/definitions/common.ErrorResponse'
       summary: List TaskComponent
       tags:
       - '[Task Component]'
@@ -709,22 +658,22 @@ paths:
         name: TaskComponent
         required: true
         schema:
-          $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.CreateTaskComponentReq'
+          $ref: '#/definitions/model.CreateTaskComponentReq'
       produces:
       - application/json
       responses:
         "200":
           description: Successfully register the task component
           schema:
-            $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.TaskComponent'
+            $ref: '#/definitions/domain.TaskComponent'
         "400":
           description: Sent bad request.
           schema:
-            $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse'
+            $ref: '#/definitions/common.ErrorResponse'
         "500":
           description: Failed to register the task component
           schema:
-            $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse'
+            $ref: '#/definitions/common.ErrorResponse'
       summary: Create TaskComponent
       tags:
       - '[Task Component]'
@@ -746,15 +695,15 @@ paths:
         "200":
           description: Successfully delete the task component
           schema:
-            $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.SimpleMsg'
+            $ref: '#/definitions/model.SimpleMsg'
         "400":
           description: Sent bad request.
           schema:
-            $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse'
+            $ref: '#/definitions/common.ErrorResponse'
         "500":
           description: Failed to delete the task component
           schema:
-            $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse'
+            $ref: '#/definitions/common.ErrorResponse'
       summary: Delete TaskComponent
       tags:
       - '[Task Component]'
@@ -775,15 +724,15 @@ paths:
         "200":
           description: Successfully get the task component
           schema:
-            $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.TaskComponent'
+            $ref: '#/definitions/domain.TaskComponent'
         "400":
           description: Sent bad request.
           schema:
-            $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse'
+            $ref: '#/definitions/common.ErrorResponse'
         "500":
           description: Failed to get the task component
           schema:
-            $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse'
+            $ref: '#/definitions/common.ErrorResponse'
       summary: Get TaskComponent
       tags:
       - '[Task Component]'
@@ -803,22 +752,22 @@ paths:
         name: TaskComponent
         required: true
         schema:
-          $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.CreateTaskComponentReq'
+          $ref: '#/definitions/model.CreateTaskComponentReq'
       produces:
       - application/json
       responses:
         "200":
           description: Successfully update the task component
           schema:
-            $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.TaskComponent'
+            $ref: '#/definitions/domain.TaskComponent'
         "400":
           description: Sent bad request.
           schema:
-            $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse'
+            $ref: '#/definitions/common.ErrorResponse'
         "500":
           description: Failed to update the task component
           schema:
-            $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse'
+            $ref: '#/definitions/common.ErrorResponse'
       summary: Update TaskComponent
       tags:
       - '[Task Component]'
@@ -840,48 +789,18 @@ paths:
         "200":
           description: Successfully get the task component
           schema:
-            $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.TaskComponent'
+            $ref: '#/definitions/domain.TaskComponent'
         "400":
           description: Sent bad request.
           schema:
-            $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse'
+            $ref: '#/definitions/common.ErrorResponse'
         "500":
           description: Failed to get the task component
           schema:
-            $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse'
+            $ref: '#/definitions/common.ErrorResponse'
       summary: Get TaskComponent by Name
       tags:
       - '[Task Component]'
-  /task_group/{tgId}:
-    get:
-      consumes:
-      - application/json
-      description: Get the task group directly.
-      operationId: get-task-group-directly
-      parameters:
-      - description: ID of the task group.
-        in: path
-        name: tgId
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Successfully get the task group.
-          schema:
-            $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.Task'
-        "400":
-          description: Sent bad request.
-          schema:
-            $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse'
-        "500":
-          description: Failed to get the task group.
-          schema:
-            $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse'
-      summary: Get TaskGroup Directly
-      tags:
-      - '[Workflow]'
   /workflow:
     get:
       consumes:
@@ -908,16 +827,16 @@ paths:
           description: Successfully get a workflow list.
           schema:
             items:
-              $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.Workflow'
+              $ref: '#/definitions/model.Workflow'
             type: array
         "400":
           description: Sent bad request.
           schema:
-            $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse'
+            $ref: '#/definitions/common.ErrorResponse'
         "500":
           description: Failed to get a workflow list.
           schema:
-            $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse'
+            $ref: '#/definitions/common.ErrorResponse'
       summary: List Workflow
       tags:
       - '[Workflow]'
@@ -932,22 +851,22 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.CreateWorkflowReq'
+          $ref: '#/definitions/model.CreateWorkflowReq'
       produces:
       - application/json
       responses:
         "200":
           description: Successfully create the workflow.
           schema:
-            $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.WorkflowTemplate'
+            $ref: '#/definitions/model.WorkflowTemplate'
         "400":
           description: Sent bad request.
           schema:
-            $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse'
+            $ref: '#/definitions/common.ErrorResponse'
         "500":
           description: Failed to create workflow.
           schema:
-            $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse'
+            $ref: '#/definitions/common.ErrorResponse'
       summary: Create Workflow
       tags:
       - '[Workflow]'
@@ -969,15 +888,15 @@ paths:
         "200":
           description: Successfully delete the workflow
           schema:
-            $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.SimpleMsg'
+            $ref: '#/definitions/model.SimpleMsg'
         "400":
           description: Sent bad request.
           schema:
-            $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse'
+            $ref: '#/definitions/common.ErrorResponse'
         "500":
           description: Failed to delete the workflow
           schema:
-            $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse'
+            $ref: '#/definitions/common.ErrorResponse'
       summary: Delete Workflow
       tags:
       - '[Workflow]'
@@ -998,15 +917,15 @@ paths:
         "200":
           description: Successfully get the workflow.
           schema:
-            $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.Workflow'
+            $ref: '#/definitions/model.Workflow'
         "400":
           description: Sent bad request.
           schema:
-            $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse'
+            $ref: '#/definitions/common.ErrorResponse'
         "500":
           description: Failed to get the workflow.
           schema:
-            $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse'
+            $ref: '#/definitions/common.ErrorResponse'
       summary: Get Workflow
       tags:
       - '[Workflow]'
@@ -1026,22 +945,22 @@ paths:
         name: Workflow
         required: true
         schema:
-          $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.CreateWorkflowReq'
+          $ref: '#/definitions/model.CreateWorkflowReq'
       produces:
       - application/json
       responses:
         "200":
           description: Successfully update the workflow
           schema:
-            $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.Workflow'
+            $ref: '#/definitions/model.Workflow'
         "400":
           description: Sent bad request.
           schema:
-            $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse'
+            $ref: '#/definitions/common.ErrorResponse'
         "500":
           description: Failed to update the workflow
           schema:
-            $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse'
+            $ref: '#/definitions/common.ErrorResponse'
       summary: Update Workflow
       tags:
       - '[Workflow]'
@@ -1072,16 +991,16 @@ paths:
           description: Successfully get the workflow.
           schema:
             items:
-              $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.EventLog'
+              $ref: '#/definitions/model.EventLog'
             type: array
         "400":
           description: Sent bad request.
           schema:
-            $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse'
+            $ref: '#/definitions/common.ErrorResponse'
         "500":
           description: Failed to get the workflow.
           schema:
-            $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse'
+            $ref: '#/definitions/common.ErrorResponse'
       summary: Get Eventlog
       tags:
       - '[Workflow]'
@@ -1103,15 +1022,15 @@ paths:
         "200":
           description: Successfully run the workflow.
           schema:
-            $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.SimpleMsg'
+            $ref: '#/definitions/model.SimpleMsg'
         "400":
           description: Sent bad request.
           schema:
-            $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse'
+            $ref: '#/definitions/common.ErrorResponse'
         "500":
           description: Failed to run the Workflow
           schema:
-            $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse'
+            $ref: '#/definitions/common.ErrorResponse'
       summary: Run Workflow
       tags:
       - '[Workflow]'
@@ -1119,7 +1038,7 @@ paths:
     get:
       consumes:
       - application/json
-      description: Get the task Logs.
+      description: Get DAG runs from Airflow API.
       operationId: get-workflow-runs
       parameters:
       - description: ID of the workflow.
@@ -1133,18 +1052,51 @@ paths:
         "200":
           description: Successfully get the workflowRuns.
           schema:
-            items:
-              $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.WorkflowRun'
-            type: array
+            $ref: '#/definitions/model.WorkflowRun'
         "400":
           description: Sent bad request.
           schema:
-            $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse'
+            $ref: '#/definitions/common.ErrorResponse'
         "500":
           description: Failed to get the workflowRuns.
           schema:
-            $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse'
+            $ref: '#/definitions/common.ErrorResponse'
       summary: Get workflowRuns
+      tags:
+      - '[Workflow]'
+    post:
+      consumes:
+      - application/json
+      description: Airflow에서 DAG 종료 시 POST로 보낸 workflow run 데이터를 DB에 저장. 실행내역 전부 INSERT.
+      operationId: create-workflow-run
+      parameters:
+      - description: ID of the workflow.
+        in: path
+        name: wfId
+        required: true
+        type: string
+      - description: Workflow run data (Airflow callback payload)
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/model.CreateWorkflowRunReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully saved workflow run
+          schema:
+            $ref: '#/definitions/model.WorkflowRun'
+        "400":
+          description: Sent bad request.
+          schema:
+            $ref: '#/definitions/common.ErrorResponse'
+        "500":
+          description: Failed to save workflow run
+          schema:
+            $ref: '#/definitions/common.ErrorResponse'
+      summary: Create WorkflowRun (DB 저장)
       tags:
       - '[Workflow]'
   /workflow/{wfId}/status:
@@ -1166,16 +1118,16 @@ paths:
           description: Successfully get the WorkflowVersion.
           schema:
             items:
-              $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.WorkflowStatus'
+              $ref: '#/definitions/model.WorkflowStatus'
             type: array
         "400":
           description: Sent bad request.
           schema:
-            $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse'
+            $ref: '#/definitions/common.ErrorResponse'
         "500":
           description: Failed to get the WorkflowVersion.
           schema:
-            $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse'
+            $ref: '#/definitions/common.ErrorResponse'
       summary: Get WorkflowStatus
       tags:
       - '[Workflow]'
@@ -1198,16 +1150,16 @@ paths:
           description: Successfully get a task list.
           schema:
             items:
-              $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.Task'
+              $ref: '#/definitions/model.Task'
             type: array
         "400":
           description: Sent bad request.
           schema:
-            $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse'
+            $ref: '#/definitions/common.ErrorResponse'
         "500":
           description: Failed to get a task list.
           schema:
-            $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse'
+            $ref: '#/definitions/common.ErrorResponse'
       summary: List Task
       tags:
       - '[Workflow]'
@@ -1234,15 +1186,15 @@ paths:
         "200":
           description: Successfully get the task.
           schema:
-            $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.Task'
+            $ref: '#/definitions/model.Task'
         "400":
           description: Sent bad request.
           schema:
-            $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse'
+            $ref: '#/definitions/common.ErrorResponse'
         "500":
           description: Failed to get the task.
           schema:
-            $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse'
+            $ref: '#/definitions/common.ErrorResponse'
       summary: Get Task
       tags:
       - '[Workflow]'
@@ -1265,16 +1217,16 @@ paths:
           description: Successfully get a task group list.
           schema:
             items:
-              $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.TaskGroup'
+              $ref: '#/definitions/model.TaskGroup'
             type: array
         "400":
           description: Sent bad request.
           schema:
-            $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse'
+            $ref: '#/definitions/common.ErrorResponse'
         "500":
           description: Failed to get a task group list.
           schema:
-            $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse'
+            $ref: '#/definitions/common.ErrorResponse'
       summary: List TaskGroup
       tags:
       - '[Workflow]'
@@ -1301,15 +1253,15 @@ paths:
         "200":
           description: Successfully get the task group.
           schema:
-            $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.Task'
+            $ref: '#/definitions/model.Task'
         "400":
           description: Sent bad request.
           schema:
-            $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse'
+            $ref: '#/definitions/common.ErrorResponse'
         "500":
           description: Failed to get the task group.
           schema:
-            $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse'
+            $ref: '#/definitions/common.ErrorResponse'
       summary: Get TaskGroup
       tags:
       - '[Workflow]'
@@ -1337,16 +1289,16 @@ paths:
           description: Successfully get a task list from the task group.
           schema:
             items:
-              $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.Task'
+              $ref: '#/definitions/model.Task'
             type: array
         "400":
           description: Sent bad request.
           schema:
-            $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse'
+            $ref: '#/definitions/common.ErrorResponse'
         "500":
           description: Failed to get a task list from the task group.
           schema:
-            $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse'
+            $ref: '#/definitions/common.ErrorResponse'
       summary: List Task from Task Group
       tags:
       - '[Workflow]'
@@ -1378,15 +1330,15 @@ paths:
         "200":
           description: Successfully get the task from the task group.
           schema:
-            $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.Task'
+            $ref: '#/definitions/model.Task'
         "400":
           description: Sent bad request.
           schema:
-            $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse'
+            $ref: '#/definitions/common.ErrorResponse'
         "500":
           description: Failed to get the task from the task group.
           schema:
-            $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse'
+            $ref: '#/definitions/common.ErrorResponse'
       summary: Get Task from Task Group
       tags:
       - '[Workflow]'
@@ -1417,52 +1369,54 @@ paths:
           description: Successfully get a workflowVersion list.
           schema:
             items:
-              $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.WorkflowVersion'
+              $ref: '#/definitions/model.WorkflowVersionSwg'
             type: array
         "400":
           description: Sent bad request.
           schema:
-            $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse'
+            $ref: '#/definitions/common.ErrorResponse'
         "500":
           description: Failed to get a workflowVersion list.
           schema:
-            $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse'
+            $ref: '#/definitions/common.ErrorResponse'
       summary: List workflowVersion
       tags:
       - '[Workflow]'
-  /workflow/{wfId}/version/{verId}:
-    get:
+  /workflow/{wfId}/versioned:
+    put:
       consumes:
       - application/json
-      description: Get the WorkflowVersion.
-      operationId: get-WorkflowVersion
+      description: Workflow를 덮어쓰지 않고 새 WorkflowVersion을 생성한 뒤, 삭제분은 soft delete, 나머지는
+        upsert. Workflow = 현재 최신 정의 포인터, WorkflowVersion = 불변 스냅샷(append-only).
+      operationId: update-workflow-versioned
       parameters:
-      - description: wfId of the workflow
+      - description: ID of the workflow.
         in: path
         name: wfId
         required: true
         type: string
-      - description: ID of the WorkflowVersion.
-        in: path
-        name: verId
+      - description: Workflow to modify.
+        in: body
+        name: Workflow
         required: true
-        type: string
+        schema:
+          $ref: '#/definitions/model.CreateWorkflowReq'
       produces:
       - application/json
       responses:
         "200":
-          description: Successfully get the WorkflowVersion.
+          description: Successfully update the workflow
           schema:
-            $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.Workflow'
+            $ref: '#/definitions/model.Workflow'
         "400":
           description: Sent bad request.
           schema:
-            $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse'
+            $ref: '#/definitions/common.ErrorResponse'
         "500":
-          description: Failed to get the WorkflowVersion.
+          description: Failed to update the workflow
           schema:
-            $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse'
-      summary: Get WorkflowVersion
+            $ref: '#/definitions/common.ErrorResponse'
+      summary: Update Workflow (버전 생성)
       tags:
       - '[Workflow]'
   /workflow/{wfId}/workflowRun/{wfRunId}/range:
@@ -1487,22 +1441,22 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.TaskClearOption'
+          $ref: '#/definitions/model.TaskClearOption'
       produces:
       - application/json
       responses:
         "200":
           description: Successfully clear the taskInstances.
           schema:
-            $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.TaskInstanceReference'
+            $ref: '#/definitions/model.TaskInstanceReference'
         "400":
           description: Sent bad request.
           schema:
-            $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse'
+            $ref: '#/definitions/common.ErrorResponse'
         "500":
           description: Failed to clear the taskInstances.
           schema:
-            $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse'
+            $ref: '#/definitions/common.ErrorResponse'
       summary: Clear taskInstances
       tags:
       - '[Workflow]'
@@ -1539,15 +1493,15 @@ paths:
         "200":
           description: Successfully get the task Logs.
           schema:
-            $ref: '#/definitions/airflow.InlineResponse200'
+            $ref: '#/definitions/model.TaskLog'
         "400":
           description: Sent bad request.
           schema:
-            $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse'
+            $ref: '#/definitions/common.ErrorResponse'
         "500":
           description: Failed to get the task Logs.
           schema:
-            $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse'
+            $ref: '#/definitions/common.ErrorResponse'
       summary: Get Task Logs
       tags:
       - '[Workflow]'
@@ -1588,11 +1542,11 @@ paths:
         "400":
           description: Sent bad request.
           schema:
-            $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse'
+            $ref: '#/definitions/common.ErrorResponse'
         "500":
           description: Failed to get the task Logs.
           schema:
-            $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse'
+            $ref: '#/definitions/common.ErrorResponse'
       summary: Download Task Logs
       tags:
       - '[Workflow]'
@@ -1619,15 +1573,15 @@ paths:
         "200":
           description: Successfully get the taskInstances.
           schema:
-            $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.TaskInstance'
+            $ref: '#/definitions/model.TaskInstance'
         "400":
           description: Sent bad request.
           schema:
-            $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse'
+            $ref: '#/definitions/common.ErrorResponse'
         "500":
           description: Failed to get the taskInstances.
           schema:
-            $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse'
+            $ref: '#/definitions/common.ErrorResponse'
       summary: Get taskInstances
       tags:
       - '[Workflow]'
@@ -1649,16 +1603,82 @@ paths:
         "200":
           description: Successfully get the workflow.
           schema:
-            $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.Workflow'
+            $ref: '#/definitions/model.Workflow'
         "400":
           description: Sent bad request.
           schema:
-            $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse'
+            $ref: '#/definitions/common.ErrorResponse'
         "500":
           description: Failed to get the workflow.
           schema:
-            $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse'
+            $ref: '#/definitions/common.ErrorResponse'
       summary: Get Workflow by Name
+      tags:
+      - '[Workflow]'
+  /workflow/tx:
+    post:
+      consumes:
+      - application/json
+      description: Create a workflow with TaskGroups/Tasks in a single DB transaction.
+      operationId: create-workflow-tx
+      parameters:
+      - description: Workflow content
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/model.CreateWorkflowReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully create the workflow.
+          schema:
+            $ref: '#/definitions/model.Workflow'
+        "400":
+          description: Sent bad request.
+          schema:
+            $ref: '#/definitions/common.ErrorResponse'
+        "500":
+          description: Failed to create workflow.
+          schema:
+            $ref: '#/definitions/common.ErrorResponse'
+      summary: Create Workflow (DB Tx)
+      tags:
+      - '[Workflow]'
+  /workflow/version/{verId}:
+    get:
+      consumes:
+      - application/json
+      description: Get the WorkflowVersion.
+      operationId: get-WorkflowVersion
+      parameters:
+      - description: wfId of the workflow
+        in: path
+        name: wfId
+        required: true
+        type: string
+      - description: ID of the WorkflowVersion.
+        in: path
+        name: verId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully get the WorkflowVersion.
+          schema:
+            $ref: '#/definitions/model.WorkflowVersionSwg'
+        "400":
+          description: Sent bad request.
+          schema:
+            $ref: '#/definitions/common.ErrorResponse'
+        "500":
+          description: Failed to get the WorkflowVersion.
+          schema:
+            $ref: '#/definitions/common.ErrorResponse'
+      summary: Get WorkflowVersion
       tags:
       - '[Workflow]'
   /workflow_template:
@@ -1687,16 +1707,16 @@ paths:
           description: Successfully get a list of workflow template.
           schema:
             items:
-              $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.WorkflowTemplate'
+              $ref: '#/definitions/model.WorkflowTemplate'
             type: array
         "400":
           description: Sent bad request.
           schema:
-            $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse'
+            $ref: '#/definitions/common.ErrorResponse'
         "500":
           description: Failed to get a list of workflow template.
           schema:
-            $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse'
+            $ref: '#/definitions/common.ErrorResponse'
       summary: List WorkflowTemplate
       tags:
       - '[Workflow Template]'
@@ -1718,15 +1738,15 @@ paths:
         "200":
           description: Successfully get the workflow template
           schema:
-            $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.GetWorkflowTemplate'
+            $ref: '#/definitions/model.WorkflowTemplate'
         "400":
           description: Sent bad request.
           schema:
-            $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse'
+            $ref: '#/definitions/common.ErrorResponse'
         "500":
           description: Failed to get the workflow template
           schema:
-            $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse'
+            $ref: '#/definitions/common.ErrorResponse'
       summary: Get WorkflowTemplate
       tags:
       - '[Workflow Template]'
@@ -1748,15 +1768,15 @@ paths:
         "200":
           description: Successfully get the workflow template
           schema:
-            $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.GetWorkflowTemplate'
+            $ref: '#/definitions/model.WorkflowTemplate'
         "400":
           description: Sent bad request.
           schema:
-            $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse'
+            $ref: '#/definitions/common.ErrorResponse'
         "500":
           description: Failed to get the workflow template
           schema:
-            $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse'
+            $ref: '#/definitions/common.ErrorResponse'
       summary: Get WorkflowTemplate by Name
       tags:
       - '[Workflow Template]'

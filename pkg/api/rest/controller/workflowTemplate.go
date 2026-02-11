@@ -1,12 +1,11 @@
 package controller
 
 import (
-	"github.com/cloud-barista/cm-cicada/dao"
-	"github.com/cloud-barista/cm-cicada/db"
-	"github.com/cloud-barista/cm-cicada/pkg/api/rest/common"
-	"github.com/cloud-barista/cm-cicada/pkg/api/rest/model"
-	"github.com/labstack/echo/v4"
 	"net/http"
+
+	"github.com/cloud-barista/cm-cicada/internal/service"
+	"github.com/cloud-barista/cm-cicada/pkg/api/rest/common"
+	"github.com/labstack/echo/v4"
 )
 
 // GetWorkflowTemplate godoc
@@ -18,16 +17,13 @@ import (
 //	@Accept			json
 //	@Produce		json
 //	@Param			wftId path string true "ID of the WorkflowTemplate"
-//	@Success		200	{object}	model.GetWorkflowTemplate	"Successfully get the workflow template"
+//	@Success		200	{object}	model.WorkflowTemplate	"Successfully get the workflow template"
 //	@Failure		400	{object}	common.ErrorResponse		"Sent bad request."
 //	@Failure		500	{object}	common.ErrorResponse		"Failed to get the workflow template"
 //	@Router			/workflow_template/{wftId} [get]
 func GetWorkflowTemplate(c echo.Context) error {
 	wftId := c.Param("wftId")
-	if wftId == "" {
-		return common.ReturnErrorMsg(c, "wftId is empty")
-	}
-	workflowTemplate, err := dao.WorkflowTemplateGet(wftId)
+	workflowTemplate, err := service.GetWorkflowTemplate(wftId)
 	if err != nil {
 		return common.ReturnErrorMsg(c, err.Error())
 	}
@@ -43,24 +39,17 @@ func GetWorkflowTemplate(c echo.Context) error {
 //	@Accept			json
 //	@Produce		json
 //	@Param			wfName path string true "Name of the WorkflowTemplate"
-//	@Success		200	{object}	model.GetWorkflowTemplate	"Successfully get the workflow template"
+//	@Success		200	{object}	model.WorkflowTemplate	"Successfully get the workflow template"
 //	@Failure		400	{object}	common.ErrorResponse		"Sent bad request."
 //	@Failure		500	{object}	common.ErrorResponse		"Failed to get the workflow template"
 //	@Router			/workflow_template/name/{wfName} [get]
 func GetWorkflowTemplateByName(c echo.Context) error {
 	wfName := c.Param("wfName")
-	if wfName == "" {
-		return common.ReturnErrorMsg(c, "wfName is empty")
+	workflowTemplate, err := service.GetWorkflowTemplateByName(wfName)
+	if err != nil {
+		return common.ReturnErrorMsg(c, err.Error())
 	}
-	workflowTemplate := db.WorkflowTemplateGetByName(wfName)
-	if workflowTemplate == nil {
-		return common.ReturnErrorMsg(c, "workflow template not found with the provided name")
-	}
-	return c.JSONPretty(http.StatusOK, model.GetWorkflowTemplate{
-		SpecVersion: workflowTemplate.SpecVersion,
-		Name:        workflowTemplate.Name,
-		Data:        workflowTemplate.Data,
-	}, "")
+	return c.JSONPretty(http.StatusOK, workflowTemplate, "")
 }
 
 // ListWorkflowTemplate godoc
@@ -84,11 +73,7 @@ func ListWorkflowTemplate(c echo.Context) error {
 		return common.ReturnErrorMsg(c, err.Error())
 	}
 
-	workflowTemplate := &model.WorkflowTemplate{
-		Name: c.QueryParam("name"),
-	}
-
-	workflowTemplateList, err := dao.WorkflowTemplateGetList(workflowTemplate, page, row)
+	workflowTemplateList, err := service.ListWorkflowTemplate(c.QueryParam("name"), page, row)
 	if err != nil {
 		return common.ReturnErrorMsg(c, err.Error())
 	}

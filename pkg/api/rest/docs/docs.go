@@ -37,19 +37,19 @@ const docTemplate = `{
                     "200": {
                         "description": "Successfully get the importErrors.",
                         "schema": {
-                            "$ref": "#/definitions/airflow.ImportErrorCollection"
+                            "$ref": "#/definitions/model.ImportErrorCollection"
                         }
                     },
                     "400": {
                         "description": "Sent bad request.",
                         "schema": {
-                            "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse"
+                            "$ref": "#/definitions/common.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Failed to get the importErrors.",
                         "schema": {
-                            "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse"
+                            "$ref": "#/definitions/common.ErrorResponse"
                         }
                     }
                 }
@@ -73,13 +73,13 @@ const docTemplate = `{
                     "200": {
                         "description": "Successfully get ready state.",
                         "schema": {
-                            "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.SimpleMsg"
+                            "$ref": "#/definitions/model.SimpleMsg"
                         }
                     },
                     "500": {
                         "description": "Failed to check ready state.",
                         "schema": {
-                            "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse"
+                            "$ref": "#/definitions/common.ErrorResponse"
                         }
                     }
                 }
@@ -106,7 +106,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.RunScriptReq"
+                            "$ref": "#/definitions/model.RunScriptReq"
                         }
                     }
                 ],
@@ -114,19 +114,19 @@ const docTemplate = `{
                     "200": {
                         "description": "Result of the script running",
                         "schema": {
-                            "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.ScriptResult"
+                            "$ref": "#/definitions/model.ScriptResult"
                         }
                     },
                     "400": {
                         "description": "Sent bad request.",
                         "schema": {
-                            "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse"
+                            "$ref": "#/definitions/common.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Failed to run script",
                         "schema": {
-                            "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse"
+                            "$ref": "#/definitions/common.ErrorResponse"
                         }
                     }
                 }
@@ -153,7 +153,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.SleepTimeReq"
+                            "$ref": "#/definitions/model.SleepTimeReq"
                         }
                     }
                 ],
@@ -161,19 +161,19 @@ const docTemplate = `{
                     "200": {
                         "description": "Result of sleep",
                         "schema": {
-                            "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.ScriptResult"
+                            "$ref": "#/definitions/model.ScriptResult"
                         }
                     },
                     "400": {
                         "description": "Sent bad request.",
                         "schema": {
-                            "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse"
+                            "$ref": "#/definitions/common.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Failed to run script",
                         "schema": {
-                            "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse"
+                            "$ref": "#/definitions/common.ErrorResponse"
                         }
                     }
                 }
@@ -206,19 +206,19 @@ const docTemplate = `{
                     "200": {
                         "description": "Successfully get the task.",
                         "schema": {
-                            "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.TaskDirectly"
+                            "$ref": "#/definitions/model.Task"
                         }
                     },
                     "400": {
                         "description": "Sent bad request.",
                         "schema": {
-                            "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse"
+                            "$ref": "#/definitions/common.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Failed to get the task.",
                         "schema": {
-                            "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse"
+                            "$ref": "#/definitions/common.ErrorResponse"
                         }
                     }
                 }
@@ -258,20 +258,20 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.TaskComponent"
+                                "$ref": "#/definitions/domain.TaskComponent"
                             }
                         }
                     },
                     "400": {
                         "description": "Sent bad request.",
                         "schema": {
-                            "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse"
+                            "$ref": "#/definitions/common.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Failed to get a list of task component.",
                         "schema": {
-                            "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse"
+                            "$ref": "#/definitions/common.ErrorResponse"
                         }
                     }
                 }
@@ -296,7 +296,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.CreateTaskComponentReq"
+                            "$ref": "#/definitions/model.CreateTaskComponentReq"
                         }
                     }
                 ],
@@ -304,19 +304,19 @@ const docTemplate = `{
                     "200": {
                         "description": "Successfully register the task component",
                         "schema": {
-                            "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.TaskComponent"
+                            "$ref": "#/definitions/domain.TaskComponent"
                         }
                     },
                     "400": {
                         "description": "Sent bad request.",
                         "schema": {
-                            "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse"
+                            "$ref": "#/definitions/common.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Failed to register the task component",
                         "schema": {
-                            "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse"
+                            "$ref": "#/definitions/common.ErrorResponse"
                         }
                     }
                 }
@@ -349,19 +349,19 @@ const docTemplate = `{
                     "200": {
                         "description": "Successfully get the task component",
                         "schema": {
-                            "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.TaskComponent"
+                            "$ref": "#/definitions/domain.TaskComponent"
                         }
                     },
                     "400": {
                         "description": "Sent bad request.",
                         "schema": {
-                            "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse"
+                            "$ref": "#/definitions/common.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Failed to get the task component",
                         "schema": {
-                            "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse"
+                            "$ref": "#/definitions/common.ErrorResponse"
                         }
                     }
                 }
@@ -394,19 +394,19 @@ const docTemplate = `{
                     "200": {
                         "description": "Successfully get the task component",
                         "schema": {
-                            "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.TaskComponent"
+                            "$ref": "#/definitions/domain.TaskComponent"
                         }
                     },
                     "400": {
                         "description": "Sent bad request.",
                         "schema": {
-                            "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse"
+                            "$ref": "#/definitions/common.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Failed to get the task component",
                         "schema": {
-                            "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse"
+                            "$ref": "#/definitions/common.ErrorResponse"
                         }
                     }
                 }
@@ -438,7 +438,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.CreateTaskComponentReq"
+                            "$ref": "#/definitions/model.CreateTaskComponentReq"
                         }
                     }
                 ],
@@ -446,19 +446,19 @@ const docTemplate = `{
                     "200": {
                         "description": "Successfully update the task component",
                         "schema": {
-                            "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.TaskComponent"
+                            "$ref": "#/definitions/domain.TaskComponent"
                         }
                     },
                     "400": {
                         "description": "Sent bad request.",
                         "schema": {
-                            "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse"
+                            "$ref": "#/definitions/common.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Failed to update the task component",
                         "schema": {
-                            "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse"
+                            "$ref": "#/definitions/common.ErrorResponse"
                         }
                     }
                 }
@@ -489,64 +489,19 @@ const docTemplate = `{
                     "200": {
                         "description": "Successfully delete the task component",
                         "schema": {
-                            "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.SimpleMsg"
+                            "$ref": "#/definitions/model.SimpleMsg"
                         }
                     },
                     "400": {
                         "description": "Sent bad request.",
                         "schema": {
-                            "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse"
+                            "$ref": "#/definitions/common.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Failed to delete the task component",
                         "schema": {
-                            "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/task_group/{tgId}": {
-            "get": {
-                "description": "Get the task group directly.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "[Workflow]"
-                ],
-                "summary": "Get TaskGroup Directly",
-                "operationId": "get-task-group-directly",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "ID of the task group.",
-                        "name": "tgId",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Successfully get the task group.",
-                        "schema": {
-                            "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.Task"
-                        }
-                    },
-                    "400": {
-                        "description": "Sent bad request.",
-                        "schema": {
-                            "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Failed to get the task group.",
-                        "schema": {
-                            "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse"
+                            "$ref": "#/definitions/common.ErrorResponse"
                         }
                     }
                 }
@@ -592,20 +547,20 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.Workflow"
+                                "$ref": "#/definitions/model.Workflow"
                             }
                         }
                     },
                     "400": {
                         "description": "Sent bad request.",
                         "schema": {
-                            "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse"
+                            "$ref": "#/definitions/common.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Failed to get a workflow list.",
                         "schema": {
-                            "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse"
+                            "$ref": "#/definitions/common.ErrorResponse"
                         }
                     }
                 }
@@ -630,7 +585,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.CreateWorkflowReq"
+                            "$ref": "#/definitions/model.CreateWorkflowReq"
                         }
                     }
                 ],
@@ -638,19 +593,19 @@ const docTemplate = `{
                     "200": {
                         "description": "Successfully create the workflow.",
                         "schema": {
-                            "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.WorkflowTemplate"
+                            "$ref": "#/definitions/model.WorkflowTemplate"
                         }
                     },
                     "400": {
                         "description": "Sent bad request.",
                         "schema": {
-                            "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse"
+                            "$ref": "#/definitions/common.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Failed to create workflow.",
                         "schema": {
-                            "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse"
+                            "$ref": "#/definitions/common.ErrorResponse"
                         }
                     }
                 }
@@ -683,19 +638,118 @@ const docTemplate = `{
                     "200": {
                         "description": "Successfully get the workflow.",
                         "schema": {
-                            "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.Workflow"
+                            "$ref": "#/definitions/model.Workflow"
                         }
                     },
                     "400": {
                         "description": "Sent bad request.",
                         "schema": {
-                            "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse"
+                            "$ref": "#/definitions/common.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Failed to get the workflow.",
                         "schema": {
-                            "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse"
+                            "$ref": "#/definitions/common.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/workflow/tx": {
+            "post": {
+                "description": "Create a workflow with TaskGroups/Tasks in a single DB transaction.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "[Workflow]"
+                ],
+                "summary": "Create Workflow (DB Tx)",
+                "operationId": "create-workflow-tx",
+                "parameters": [
+                    {
+                        "description": "Workflow content",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.CreateWorkflowReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successfully create the workflow.",
+                        "schema": {
+                            "$ref": "#/definitions/model.Workflow"
+                        }
+                    },
+                    "400": {
+                        "description": "Sent bad request.",
+                        "schema": {
+                            "$ref": "#/definitions/common.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Failed to create workflow.",
+                        "schema": {
+                            "$ref": "#/definitions/common.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/workflow/version/{verId}": {
+            "get": {
+                "description": "Get the WorkflowVersion.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "[Workflow]"
+                ],
+                "summary": "Get WorkflowVersion",
+                "operationId": "get-WorkflowVersion",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "wfId of the workflow",
+                        "name": "wfId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "ID of the WorkflowVersion.",
+                        "name": "verId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successfully get the WorkflowVersion.",
+                        "schema": {
+                            "$ref": "#/definitions/model.WorkflowVersionSwg"
+                        }
+                    },
+                    "400": {
+                        "description": "Sent bad request.",
+                        "schema": {
+                            "$ref": "#/definitions/common.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Failed to get the WorkflowVersion.",
+                        "schema": {
+                            "$ref": "#/definitions/common.ErrorResponse"
                         }
                     }
                 }
@@ -728,19 +782,19 @@ const docTemplate = `{
                     "200": {
                         "description": "Successfully get the workflow.",
                         "schema": {
-                            "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.Workflow"
+                            "$ref": "#/definitions/model.Workflow"
                         }
                     },
                     "400": {
                         "description": "Sent bad request.",
                         "schema": {
-                            "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse"
+                            "$ref": "#/definitions/common.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Failed to get the workflow.",
                         "schema": {
-                            "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse"
+                            "$ref": "#/definitions/common.ErrorResponse"
                         }
                     }
                 }
@@ -772,7 +826,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.CreateWorkflowReq"
+                            "$ref": "#/definitions/model.CreateWorkflowReq"
                         }
                     }
                 ],
@@ -780,19 +834,19 @@ const docTemplate = `{
                     "200": {
                         "description": "Successfully update the workflow",
                         "schema": {
-                            "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.Workflow"
+                            "$ref": "#/definitions/model.Workflow"
                         }
                     },
                     "400": {
                         "description": "Sent bad request.",
                         "schema": {
-                            "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse"
+                            "$ref": "#/definitions/common.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Failed to update the workflow",
                         "schema": {
-                            "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse"
+                            "$ref": "#/definitions/common.ErrorResponse"
                         }
                     }
                 }
@@ -823,19 +877,19 @@ const docTemplate = `{
                     "200": {
                         "description": "Successfully delete the workflow",
                         "schema": {
-                            "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.SimpleMsg"
+                            "$ref": "#/definitions/model.SimpleMsg"
                         }
                     },
                     "400": {
                         "description": "Sent bad request.",
                         "schema": {
-                            "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse"
+                            "$ref": "#/definitions/common.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Failed to delete the workflow",
                         "schema": {
-                            "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse"
+                            "$ref": "#/definitions/common.ErrorResponse"
                         }
                     }
                 }
@@ -882,20 +936,20 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.EventLog"
+                                "$ref": "#/definitions/model.EventLog"
                             }
                         }
                     },
                     "400": {
                         "description": "Sent bad request.",
                         "schema": {
-                            "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse"
+                            "$ref": "#/definitions/common.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Failed to get the workflow.",
                         "schema": {
-                            "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse"
+                            "$ref": "#/definitions/common.ErrorResponse"
                         }
                     }
                 }
@@ -928,19 +982,19 @@ const docTemplate = `{
                     "200": {
                         "description": "Successfully run the workflow.",
                         "schema": {
-                            "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.SimpleMsg"
+                            "$ref": "#/definitions/model.SimpleMsg"
                         }
                     },
                     "400": {
                         "description": "Sent bad request.",
                         "schema": {
-                            "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse"
+                            "$ref": "#/definitions/common.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Failed to run the Workflow",
                         "schema": {
-                            "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse"
+                            "$ref": "#/definitions/common.ErrorResponse"
                         }
                     }
                 }
@@ -948,7 +1002,7 @@ const docTemplate = `{
         },
         "/workflow/{wfId}/runs": {
             "get": {
-                "description": "Get the task Logs.",
+                "description": "Get DAG runs from Airflow API.",
                 "consumes": [
                     "application/json"
                 ],
@@ -973,22 +1027,71 @@ const docTemplate = `{
                     "200": {
                         "description": "Successfully get the workflowRuns.",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.WorkflowRun"
-                            }
+                            "$ref": "#/definitions/model.WorkflowRun"
                         }
                     },
                     "400": {
                         "description": "Sent bad request.",
                         "schema": {
-                            "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse"
+                            "$ref": "#/definitions/common.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Failed to get the workflowRuns.",
                         "schema": {
-                            "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse"
+                            "$ref": "#/definitions/common.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Airflow에서 DAG 종료 시 POST로 보낸 workflow run 데이터를 DB에 저장. 실행내역 전부 INSERT.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "[Workflow]"
+                ],
+                "summary": "Create WorkflowRun (DB 저장)",
+                "operationId": "create-workflow-run",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID of the workflow.",
+                        "name": "wfId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Workflow run data (Airflow callback payload)",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.CreateWorkflowRunReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successfully saved workflow run",
+                        "schema": {
+                            "$ref": "#/definitions/model.WorkflowRun"
+                        }
+                    },
+                    "400": {
+                        "description": "Sent bad request.",
+                        "schema": {
+                            "$ref": "#/definitions/common.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Failed to save workflow run",
+                        "schema": {
+                            "$ref": "#/definitions/common.ErrorResponse"
                         }
                     }
                 }
@@ -1023,20 +1126,20 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.WorkflowStatus"
+                                "$ref": "#/definitions/model.WorkflowStatus"
                             }
                         }
                     },
                     "400": {
                         "description": "Sent bad request.",
                         "schema": {
-                            "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse"
+                            "$ref": "#/definitions/common.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Failed to get the WorkflowVersion.",
                         "schema": {
-                            "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse"
+                            "$ref": "#/definitions/common.ErrorResponse"
                         }
                     }
                 }
@@ -1071,20 +1174,20 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.Task"
+                                "$ref": "#/definitions/model.Task"
                             }
                         }
                     },
                     "400": {
                         "description": "Sent bad request.",
                         "schema": {
-                            "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse"
+                            "$ref": "#/definitions/common.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Failed to get a task list.",
                         "schema": {
-                            "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse"
+                            "$ref": "#/definitions/common.ErrorResponse"
                         }
                     }
                 }
@@ -1124,19 +1227,19 @@ const docTemplate = `{
                     "200": {
                         "description": "Successfully get the task.",
                         "schema": {
-                            "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.Task"
+                            "$ref": "#/definitions/model.Task"
                         }
                     },
                     "400": {
                         "description": "Sent bad request.",
                         "schema": {
-                            "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse"
+                            "$ref": "#/definitions/common.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Failed to get the task.",
                         "schema": {
-                            "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse"
+                            "$ref": "#/definitions/common.ErrorResponse"
                         }
                     }
                 }
@@ -1171,20 +1274,20 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.TaskGroup"
+                                "$ref": "#/definitions/model.TaskGroup"
                             }
                         }
                     },
                     "400": {
                         "description": "Sent bad request.",
                         "schema": {
-                            "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse"
+                            "$ref": "#/definitions/common.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Failed to get a task group list.",
                         "schema": {
-                            "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse"
+                            "$ref": "#/definitions/common.ErrorResponse"
                         }
                     }
                 }
@@ -1224,19 +1327,19 @@ const docTemplate = `{
                     "200": {
                         "description": "Successfully get the task group.",
                         "schema": {
-                            "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.Task"
+                            "$ref": "#/definitions/model.Task"
                         }
                     },
                     "400": {
                         "description": "Sent bad request.",
                         "schema": {
-                            "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse"
+                            "$ref": "#/definitions/common.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Failed to get the task group.",
                         "schema": {
-                            "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse"
+                            "$ref": "#/definitions/common.ErrorResponse"
                         }
                     }
                 }
@@ -1278,20 +1381,20 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.Task"
+                                "$ref": "#/definitions/model.Task"
                             }
                         }
                     },
                     "400": {
                         "description": "Sent bad request.",
                         "schema": {
-                            "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse"
+                            "$ref": "#/definitions/common.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Failed to get a task list from the task group.",
                         "schema": {
-                            "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse"
+                            "$ref": "#/definitions/common.ErrorResponse"
                         }
                     }
                 }
@@ -1338,19 +1441,19 @@ const docTemplate = `{
                     "200": {
                         "description": "Successfully get the task from the task group.",
                         "schema": {
-                            "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.Task"
+                            "$ref": "#/definitions/model.Task"
                         }
                     },
                     "400": {
                         "description": "Sent bad request.",
                         "schema": {
-                            "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse"
+                            "$ref": "#/definitions/common.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Failed to get the task from the task group.",
                         "schema": {
-                            "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse"
+                            "$ref": "#/definitions/common.ErrorResponse"
                         }
                     }
                 }
@@ -1397,28 +1500,28 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.WorkflowVersion"
+                                "$ref": "#/definitions/model.WorkflowVersionSwg"
                             }
                         }
                     },
                     "400": {
                         "description": "Sent bad request.",
                         "schema": {
-                            "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse"
+                            "$ref": "#/definitions/common.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Failed to get a workflowVersion list.",
                         "schema": {
-                            "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse"
+                            "$ref": "#/definitions/common.ErrorResponse"
                         }
                     }
                 }
             }
         },
-        "/workflow/{wfId}/version/{verId}": {
-            "get": {
-                "description": "Get the WorkflowVersion.",
+        "/workflow/{wfId}/versioned": {
+            "put": {
+                "description": "Workflow를 덮어쓰지 않고 새 WorkflowVersion을 생성한 뒤, 삭제분은 soft delete, 나머지는 upsert. Workflow = 현재 최신 정의 포인터, WorkflowVersion = 불변 스냅샷(append-only).",
                 "consumes": [
                     "application/json"
                 ],
@@ -1428,41 +1531,43 @@ const docTemplate = `{
                 "tags": [
                     "[Workflow]"
                 ],
-                "summary": "Get WorkflowVersion",
-                "operationId": "get-WorkflowVersion",
+                "summary": "Update Workflow (버전 생성)",
+                "operationId": "update-workflow-versioned",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "wfId of the workflow",
+                        "description": "ID of the workflow.",
                         "name": "wfId",
                         "in": "path",
                         "required": true
                     },
                     {
-                        "type": "string",
-                        "description": "ID of the WorkflowVersion.",
-                        "name": "verId",
-                        "in": "path",
-                        "required": true
+                        "description": "Workflow to modify.",
+                        "name": "Workflow",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.CreateWorkflowReq"
+                        }
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "Successfully get the WorkflowVersion.",
+                        "description": "Successfully update the workflow",
                         "schema": {
-                            "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.Workflow"
+                            "$ref": "#/definitions/model.Workflow"
                         }
                     },
                     "400": {
                         "description": "Sent bad request.",
                         "schema": {
-                            "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse"
+                            "$ref": "#/definitions/common.ErrorResponse"
                         }
                     },
                     "500": {
-                        "description": "Failed to get the WorkflowVersion.",
+                        "description": "Failed to update the workflow",
                         "schema": {
-                            "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse"
+                            "$ref": "#/definitions/common.ErrorResponse"
                         }
                     }
                 }
@@ -1503,7 +1608,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.TaskClearOption"
+                            "$ref": "#/definitions/model.TaskClearOption"
                         }
                     }
                 ],
@@ -1511,19 +1616,19 @@ const docTemplate = `{
                     "200": {
                         "description": "Successfully clear the taskInstances.",
                         "schema": {
-                            "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.TaskInstanceReference"
+                            "$ref": "#/definitions/model.TaskInstanceReference"
                         }
                     },
                     "400": {
                         "description": "Sent bad request.",
                         "schema": {
-                            "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse"
+                            "$ref": "#/definitions/common.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Failed to clear the taskInstances.",
                         "schema": {
-                            "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse"
+                            "$ref": "#/definitions/common.ErrorResponse"
                         }
                     }
                 }
@@ -1577,19 +1682,19 @@ const docTemplate = `{
                     "200": {
                         "description": "Successfully get the task Logs.",
                         "schema": {
-                            "$ref": "#/definitions/airflow.InlineResponse200"
+                            "$ref": "#/definitions/model.TaskLog"
                         }
                     },
                     "400": {
                         "description": "Sent bad request.",
                         "schema": {
-                            "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse"
+                            "$ref": "#/definitions/common.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Failed to get the task Logs.",
                         "schema": {
-                            "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse"
+                            "$ref": "#/definitions/common.ErrorResponse"
                         }
                     }
                 }
@@ -1649,13 +1754,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Sent bad request.",
                         "schema": {
-                            "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse"
+                            "$ref": "#/definitions/common.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Failed to get the task Logs.",
                         "schema": {
-                            "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse"
+                            "$ref": "#/definitions/common.ErrorResponse"
                         }
                     }
                 }
@@ -1695,19 +1800,19 @@ const docTemplate = `{
                     "200": {
                         "description": "Successfully get the taskInstances.",
                         "schema": {
-                            "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.TaskInstance"
+                            "$ref": "#/definitions/model.TaskInstance"
                         }
                     },
                     "400": {
                         "description": "Sent bad request.",
                         "schema": {
-                            "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse"
+                            "$ref": "#/definitions/common.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Failed to get the taskInstances.",
                         "schema": {
-                            "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse"
+                            "$ref": "#/definitions/common.ErrorResponse"
                         }
                     }
                 }
@@ -1753,20 +1858,20 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.WorkflowTemplate"
+                                "$ref": "#/definitions/model.WorkflowTemplate"
                             }
                         }
                     },
                     "400": {
                         "description": "Sent bad request.",
                         "schema": {
-                            "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse"
+                            "$ref": "#/definitions/common.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Failed to get a list of workflow template.",
                         "schema": {
-                            "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse"
+                            "$ref": "#/definitions/common.ErrorResponse"
                         }
                     }
                 }
@@ -1799,19 +1904,19 @@ const docTemplate = `{
                     "200": {
                         "description": "Successfully get the workflow template",
                         "schema": {
-                            "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.GetWorkflowTemplate"
+                            "$ref": "#/definitions/model.WorkflowTemplate"
                         }
                     },
                     "400": {
                         "description": "Sent bad request.",
                         "schema": {
-                            "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse"
+                            "$ref": "#/definitions/common.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Failed to get the workflow template",
                         "schema": {
-                            "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse"
+                            "$ref": "#/definitions/common.ErrorResponse"
                         }
                     }
                 }
@@ -1844,19 +1949,19 @@ const docTemplate = `{
                     "200": {
                         "description": "Successfully get the workflow template",
                         "schema": {
-                            "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.GetWorkflowTemplate"
+                            "$ref": "#/definitions/model.WorkflowTemplate"
                         }
                     },
                     "400": {
                         "description": "Sent bad request.",
                         "schema": {
-                            "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse"
+                            "$ref": "#/definitions/common.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Failed to get the workflow template",
                         "schema": {
-                            "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse"
+                            "$ref": "#/definitions/common.ErrorResponse"
                         }
                     }
                 }
@@ -1864,54 +1969,7 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "airflow.ImportError": {
-            "type": "object",
-            "properties": {
-                "filename": {
-                    "description": "The filename",
-                    "type": "string"
-                },
-                "import_error_id": {
-                    "description": "The import error ID.",
-                    "type": "integer"
-                },
-                "stack_trace": {
-                    "description": "The full stackstrace..",
-                    "type": "string"
-                },
-                "timestamp": {
-                    "description": "The time when this error was created.",
-                    "type": "string"
-                }
-            }
-        },
-        "airflow.ImportErrorCollection": {
-            "type": "object",
-            "properties": {
-                "import_errors": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/airflow.ImportError"
-                    }
-                },
-                "total_entries": {
-                    "description": "Count of objects in the current result set.",
-                    "type": "integer"
-                }
-            }
-        },
-        "airflow.InlineResponse200": {
-            "type": "object",
-            "properties": {
-                "content": {
-                    "type": "string"
-                },
-                "continuation_token": {
-                    "type": "string"
-                }
-            }
-        },
-        "github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse": {
+        "common.ErrorResponse": {
             "type": "object",
             "properties": {
                 "error": {
@@ -1919,7 +1977,127 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_cloud-barista_cm-cicada_pkg_api_rest_model.CreateDataReq": {
+        "domain.ParameterStructure": {
+            "type": "object",
+            "properties": {
+                "properties": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "$ref": "#/definitions/domain.PropertyDef"
+                    }
+                },
+                "required": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "domain.PropertyDef": {
+            "type": "object",
+            "properties": {
+                "default": {},
+                "description": {
+                    "type": "string"
+                },
+                "enum": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "example": {},
+                "items": {
+                    "$ref": "#/definitions/domain.PropertyDef"
+                },
+                "properties": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "$ref": "#/definitions/domain.PropertyDef"
+                    }
+                },
+                "required": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "type": {
+                    "type": "string"
+                }
+            }
+        },
+        "domain.TaskComponent": {
+            "type": "object",
+            "required": [
+                "data",
+                "id",
+                "name"
+            ],
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "data": {
+                    "$ref": "#/definitions/domain.TaskComponentData"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "is_example": {
+                    "type": "boolean"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "domain.TaskComponentData": {
+            "type": "object",
+            "properties": {
+                "body_params": {
+                    "$ref": "#/definitions/domain.ParameterStructure"
+                },
+                "options": {
+                    "$ref": "#/definitions/domain.TaskComponentOptions"
+                },
+                "path_params": {
+                    "$ref": "#/definitions/domain.ParameterStructure"
+                },
+                "query_params": {
+                    "$ref": "#/definitions/domain.ParameterStructure"
+                }
+            }
+        },
+        "domain.TaskComponentOptions": {
+            "type": "object",
+            "properties": {
+                "api_connection_id": {
+                    "type": "string"
+                },
+                "endpoint": {
+                    "type": "string"
+                },
+                "extra": {
+                    "type": "object",
+                    "additionalProperties": true
+                },
+                "method": {
+                    "type": "string"
+                },
+                "request_body": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.CreateDataReq": {
             "type": "object",
             "required": [
                 "task_groups"
@@ -1931,12 +2109,12 @@ const docTemplate = `{
                 "task_groups": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.CreateTaskGroupReq"
+                        "$ref": "#/definitions/model.CreateTaskGroupReq"
                     }
                 }
             }
         },
-        "github_com_cloud-barista_cm-cicada_pkg_api_rest_model.CreateTaskComponentReq": {
+        "model.CreateTaskComponentReq": {
             "type": "object",
             "required": [
                 "data",
@@ -1944,14 +2122,14 @@ const docTemplate = `{
             ],
             "properties": {
                 "data": {
-                    "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.TaskComponentData"
+                    "$ref": "#/definitions/domain.TaskComponentData"
                 },
                 "name": {
                     "type": "string"
                 }
             }
         },
-        "github_com_cloud-barista_cm-cicada_pkg_api_rest_model.CreateTaskGroupReq": {
+        "model.CreateTaskGroupReq": {
             "type": "object",
             "required": [
                 "name",
@@ -1967,12 +2145,12 @@ const docTemplate = `{
                 "tasks": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.CreateTaskReq"
+                        "$ref": "#/definitions/model.CreateTaskReq"
                     }
                 }
             }
         },
-        "github_com_cloud-barista_cm-cicada_pkg_api_rest_model.CreateTaskReq": {
+        "model.CreateTaskReq": {
             "type": "object",
             "required": [
                 "name",
@@ -2013,7 +2191,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_cloud-barista_cm-cicada_pkg_api_rest_model.CreateWorkflowReq": {
+        "model.CreateWorkflowReq": {
             "type": "object",
             "required": [
                 "data",
@@ -2021,7 +2199,7 @@ const docTemplate = `{
             ],
             "properties": {
                 "data": {
-                    "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.CreateDataReq"
+                    "$ref": "#/definitions/model.CreateDataReq"
                 },
                 "name": {
                     "type": "string"
@@ -2031,7 +2209,37 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_cloud-barista_cm-cicada_pkg_api_rest_model.Data": {
+        "model.CreateWorkflowRunReq": {
+            "type": "object",
+            "required": [
+                "workflow_id",
+                "workflow_run_id"
+            ],
+            "properties": {
+                "end_date": {
+                    "type": "string"
+                },
+                "execution_date": {
+                    "type": "string"
+                },
+                "run_type": {
+                    "type": "string"
+                },
+                "start_date": {
+                    "type": "string"
+                },
+                "state": {
+                    "type": "string"
+                },
+                "workflow_id": {
+                    "type": "string"
+                },
+                "workflow_run_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.Data": {
             "type": "object",
             "required": [
                 "task_groups"
@@ -2043,12 +2251,12 @@ const docTemplate = `{
                 "task_groups": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.TaskGroup"
+                        "$ref": "#/definitions/model.TaskGroup"
                     }
                 }
             }
         },
-        "github_com_cloud-barista_cm-cicada_pkg_api_rest_model.EventLog": {
+        "model.EventLog": {
             "type": "object",
             "properties": {
                 "event": {
@@ -2077,77 +2285,29 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_cloud-barista_cm-cicada_pkg_api_rest_model.GetWorkflowTemplate": {
+        "model.ImportError": {
             "type": "object",
-            "required": [
-                "data",
-                "name",
-                "spec_version"
-            ],
             "properties": {
-                "data": {
-                    "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.CreateDataReq"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "spec_version": {
+                "error": {
                     "type": "string"
                 }
             }
         },
-        "github_com_cloud-barista_cm-cicada_pkg_api_rest_model.ParameterStructure": {
+        "model.ImportErrorCollection": {
             "type": "object",
             "properties": {
-                "properties": {
-                    "type": "object",
-                    "additionalProperties": {
-                        "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.PropertyDef"
-                    }
-                },
-                "required": {
+                "import_errors": {
                     "type": "array",
                     "items": {
-                        "type": "string"
+                        "$ref": "#/definitions/model.ImportError"
                     }
+                },
+                "total_entries": {
+                    "type": "integer"
                 }
             }
         },
-        "github_com_cloud-barista_cm-cicada_pkg_api_rest_model.PropertyDef": {
-            "type": "object",
-            "properties": {
-                "default": {},
-                "description": {
-                    "type": "string"
-                },
-                "enum": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                },
-                "example": {},
-                "items": {
-                    "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.PropertyDef"
-                },
-                "properties": {
-                    "type": "object",
-                    "additionalProperties": {
-                        "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.PropertyDef"
-                    }
-                },
-                "required": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                },
-                "type": {
-                    "type": "string"
-                }
-            }
-        },
-        "github_com_cloud-barista_cm-cicada_pkg_api_rest_model.RunScriptReq": {
+        "model.RunScriptReq": {
             "type": "object",
             "properties": {
                 "content": {
@@ -2165,7 +2325,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_cloud-barista_cm-cicada_pkg_api_rest_model.ScriptResult": {
+        "model.ScriptResult": {
             "type": "object",
             "properties": {
                 "error": {
@@ -2179,7 +2339,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_cloud-barista_cm-cicada_pkg_api_rest_model.SimpleMsg": {
+        "model.SimpleMsg": {
             "type": "object",
             "properties": {
                 "message": {
@@ -2187,7 +2347,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_cloud-barista_cm-cicada_pkg_api_rest_model.SleepTimeReq": {
+        "model.SleepTimeReq": {
             "type": "object",
             "properties": {
                 "time": {
@@ -2196,151 +2356,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_cloud-barista_cm-cicada_pkg_api_rest_model.Task": {
-            "type": "object",
-            "required": [
-                "id",
-                "name",
-                "request_body",
-                "task_component"
-            ],
-            "properties": {
-                "dependencies": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                },
-                "extra": {
-                    "type": "object",
-                    "additionalProperties": true
-                },
-                "id": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "path_params": {
-                    "type": "object",
-                    "additionalProperties": {
-                        "type": "string"
-                    }
-                },
-                "query_params": {
-                    "type": "object",
-                    "additionalProperties": {
-                        "type": "string"
-                    }
-                },
-                "request_body": {
-                    "type": "string"
-                },
-                "task_component": {
-                    "type": "string"
-                }
-            }
-        },
-        "github_com_cloud-barista_cm-cicada_pkg_api_rest_model.TaskClearOption": {
-            "type": "object",
-            "properties": {
-                "dryRun": {
-                    "type": "boolean"
-                },
-                "includeDownstream": {
-                    "type": "boolean"
-                },
-                "includeUpstream": {
-                    "description": "IncludeFuture     bool     ` + "`" + `json:\"includeFuture\"` + "`" + `\nIncludeParentdag  bool     ` + "`" + `json:\"includeParentdag\"` + "`" + `\nIncludePast       bool     ` + "`" + `json:\"includePast\"` + "`" + `\nIncludeSubdags    bool     ` + "`" + `json:\"includeSubdags\"` + "`" + `",
-                    "type": "boolean"
-                },
-                "onlyFailed": {
-                    "type": "boolean"
-                },
-                "onlyRunning": {
-                    "type": "boolean"
-                },
-                "resetDagRuns": {
-                    "type": "boolean"
-                },
-                "taskIds": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                }
-            }
-        },
-        "github_com_cloud-barista_cm-cicada_pkg_api_rest_model.TaskComponent": {
-            "type": "object",
-            "required": [
-                "data",
-                "id",
-                "name"
-            ],
-            "properties": {
-                "created_at": {
-                    "type": "string"
-                },
-                "data": {
-                    "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.TaskComponentData"
-                },
-                "description": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "is_example": {
-                    "type": "boolean"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "updated_at": {
-                    "type": "string"
-                }
-            }
-        },
-        "github_com_cloud-barista_cm-cicada_pkg_api_rest_model.TaskComponentData": {
-            "type": "object",
-            "properties": {
-                "body_params": {
-                    "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.ParameterStructure"
-                },
-                "options": {
-                    "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.TaskComponentOptions"
-                },
-                "path_params": {
-                    "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.ParameterStructure"
-                },
-                "query_params": {
-                    "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.ParameterStructure"
-                }
-            }
-        },
-        "github_com_cloud-barista_cm-cicada_pkg_api_rest_model.TaskComponentOptions": {
-            "type": "object",
-            "properties": {
-                "api_connection_id": {
-                    "type": "string"
-                },
-                "endpoint": {
-                    "type": "string"
-                },
-                "extra": {
-                    "type": "object",
-                    "additionalProperties": true
-                },
-                "method": {
-                    "type": "string"
-                },
-                "request_body": {
-                    "type": "string"
-                }
-            }
-        },
-        "github_com_cloud-barista_cm-cicada_pkg_api_rest_model.TaskDirectly": {
+        "model.Task": {
             "type": "object",
             "required": [
                 "id",
@@ -2393,12 +2409,43 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_cloud-barista_cm-cicada_pkg_api_rest_model.TaskGroup": {
+        "model.TaskClearOption": {
+            "type": "object",
+            "properties": {
+                "dryRun": {
+                    "type": "boolean"
+                },
+                "includeDownstream": {
+                    "type": "boolean"
+                },
+                "includeUpstream": {
+                    "description": "IncludeFuture     bool     ` + "`" + `json:\"includeFuture\"` + "`" + `\nIncludeParentdag  bool     ` + "`" + `json:\"includeParentdag\"` + "`" + `\nIncludePast       bool     ` + "`" + `json:\"includePast\"` + "`" + `\nIncludeSubdags    bool     ` + "`" + `json:\"includeSubdags\"` + "`" + `",
+                    "type": "boolean"
+                },
+                "onlyFailed": {
+                    "type": "boolean"
+                },
+                "onlyRunning": {
+                    "type": "boolean"
+                },
+                "resetDagRuns": {
+                    "type": "boolean"
+                },
+                "taskIds": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "model.TaskGroup": {
             "type": "object",
             "required": [
                 "id",
                 "name",
-                "tasks"
+                "tasks",
+                "workflow_id"
             ],
             "properties": {
                 "description": {
@@ -2413,12 +2460,15 @@ const docTemplate = `{
                 "tasks": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.Task"
+                        "$ref": "#/definitions/model.Task"
                     }
+                },
+                "workflow_id": {
+                    "type": "string"
                 }
             }
         },
-        "github_com_cloud-barista_cm-cicada_pkg_api_rest_model.TaskInstance": {
+        "model.TaskInstance": {
             "type": "object",
             "properties": {
                 "duration_date": {
@@ -2459,7 +2509,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_cloud-barista_cm-cicada_pkg_api_rest_model.TaskInstanceReference": {
+        "model.TaskInstanceReference": {
             "type": "object",
             "properties": {
                 "execution_date": {
@@ -2482,7 +2532,15 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_cloud-barista_cm-cicada_pkg_api_rest_model.Workflow": {
+        "model.TaskLog": {
+            "type": "object",
+            "properties": {
+                "content": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.Workflow": {
             "type": "object",
             "required": [
                 "data",
@@ -2495,7 +2553,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "data": {
-                    "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.Data"
+                    "$ref": "#/definitions/model.Data"
                 },
                 "id": {
                     "type": "string"
@@ -2511,19 +2569,9 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_cloud-barista_cm-cicada_pkg_api_rest_model.WorkflowRun": {
+        "model.WorkflowRun": {
             "type": "object",
             "properties": {
-                "conf": {
-                    "type": "object",
-                    "additionalProperties": true
-                },
-                "data_interval_end": {
-                    "type": "string"
-                },
-                "data_interval_start": {
-                    "type": "string"
-                },
                 "duration_date": {
                     "type": "number"
                 },
@@ -2533,16 +2581,7 @@ const docTemplate = `{
                 "execution_date": {
                     "type": "string"
                 },
-                "external_trigger": {
-                    "type": "boolean"
-                },
-                "last_scheduling_decision": {
-                    "type": "string"
-                },
-                "logical_date": {
-                    "type": "string"
-                },
-                "note": {
+                "id": {
                     "type": "string"
                 },
                 "run_type": {
@@ -2556,13 +2595,10 @@ const docTemplate = `{
                 },
                 "workflow_id": {
                     "type": "string"
-                },
-                "workflow_run_id": {
-                    "type": "string"
                 }
             }
         },
-        "github_com_cloud-barista_cm-cicada_pkg_api_rest_model.WorkflowStatus": {
+        "model.WorkflowStatus": {
             "type": "object",
             "properties": {
                 "count": {
@@ -2573,20 +2609,16 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_cloud-barista_cm-cicada_pkg_api_rest_model.WorkflowTemplate": {
+        "model.WorkflowTemplate": {
             "type": "object",
             "required": [
                 "data",
-                "id",
                 "name",
                 "spec_version"
             ],
             "properties": {
                 "data": {
-                    "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.CreateDataReq"
-                },
-                "id": {
-                    "type": "string"
+                    "$ref": "#/definitions/model.Data"
                 },
                 "name": {
                     "type": "string"
@@ -2596,23 +2628,21 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_cloud-barista_cm-cicada_pkg_api_rest_model.WorkflowVersion": {
+        "model.WorkflowVersionSwg": {
             "type": "object",
             "required": [
-                "action",
                 "id",
                 "spec_version",
-                "workflowId"
+                "version",
+                "workflow_id"
             ],
             "properties": {
-                "action": {
-                    "type": "string"
-                },
                 "created_at": {
                     "type": "string"
                 },
-                "data": {
-                    "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.Workflow"
+                "definition_snapshot": {
+                    "type": "object",
+                    "additionalProperties": true
                 },
                 "id": {
                     "type": "string"
@@ -2620,7 +2650,10 @@ const docTemplate = `{
                 "spec_version": {
                     "type": "string"
                 },
-                "workflowId": {
+                "version": {
+                    "type": "integer"
+                },
+                "workflow_id": {
                     "type": "string"
                 }
             }

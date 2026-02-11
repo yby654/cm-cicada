@@ -2,13 +2,14 @@ package server
 
 import (
 	"fmt"
-	"github.com/cloud-barista/cm-cicada/common"
-	"github.com/cloud-barista/cm-cicada/pkg/api/rest/middlewares"
-	"github.com/cloud-barista/cm-cicada/pkg/api/rest/route"
 	"net"
 	"strings"
 
-	"github.com/cloud-barista/cm-cicada/lib/config"
+	"github.com/cloud-barista/cm-cicada/common"
+	"github.com/cloud-barista/cm-cicada/pkg/api/rest/middlewares"
+	"github.com/cloud-barista/cm-cicada/pkg/api/rest/route"
+
+	"github.com/cloud-barista/cm-cicada/internal/lib/config"
 	_ "github.com/cloud-barista/cm-cicada/pkg/api/rest/docs" // Cicada Documentation
 	"github.com/jollaman999/utils/logger"
 	"github.com/labstack/echo/v4"

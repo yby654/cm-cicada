@@ -1,13 +1,12 @@
 package controller
 
 import (
-	"github.com/cloud-barista/cm-cicada/dao"
-	"github.com/cloud-barista/cm-cicada/db"
+	"net/http"
+
+	"github.com/cloud-barista/cm-cicada/internal/service"
 	"github.com/cloud-barista/cm-cicada/pkg/api/rest/common"
 	"github.com/cloud-barista/cm-cicada/pkg/api/rest/model"
-	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
-	"net/http"
 )
 
 // CreateTaskComponent godoc
@@ -19,7 +18,7 @@ import (
 //	@Accept		json
 //	@Produce		json
 //	@Param		TaskComponent body model.CreateTaskComponentReq true "task component to create."
-//	@Success		200	{object}	model.TaskComponent		"Successfully register the task component"
+//	@Success		200	{object}	domain.TaskComponent		"Successfully register the task component"
 //	@Failure		400	{object}	common.ErrorResponse	"Sent bad request."
 //	@Failure		500	{object}	common.ErrorResponse	"Failed to register the task component"
 //	@Router		/task_component [post]
@@ -29,21 +28,10 @@ func CreateTaskComponent(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-
-	if createTaskComponentReq.Name == "" {
-		return common.ReturnErrorMsg(c, "Please provide the name.")
-	}
-
-	var taskComponent model.TaskComponent
-	taskComponent.ID = uuid.New().String()
-	taskComponent.Name = createTaskComponentReq.Name
-	taskComponent.Data = createTaskComponentReq.Data
-
-	_, err = dao.TaskComponentCreate(&taskComponent)
+	taskComponent, err := service.CreateTaskComponent(*createTaskComponentReq)
 	if err != nil {
 		return common.ReturnErrorMsg(c, err.Error())
 	}
-
 	return c.JSONPretty(http.StatusOK, taskComponent, " ")
 }
 
@@ -56,16 +44,13 @@ func CreateTaskComponent(c echo.Context) error {
 //	@Accept		json
 //	@Produce		json
 //	@Param		tcId path string true "ID of the TaskComponent"
-//	@Success		200	{object}	model.TaskComponent		"Successfully get the task component"
+//	@Success		200	{object}	domain.TaskComponent		"Successfully get the task component"
 //	@Failure		400	{object}	common.ErrorResponse	"Sent bad request."
 //	@Failure		500	{object}	common.ErrorResponse	"Failed to get the task component"
 //	@Router		/task_component/{tcId} [get]
 func GetTaskComponent(c echo.Context) error {
 	tcId := c.Param("tcId")
-	if tcId == "" {
-		return common.ReturnErrorMsg(c, "tcId is empty")
-	}
-	taskComponent, err := dao.TaskComponentGet(tcId)
+	taskComponent, err := service.GetTaskComponent(tcId)
 	if err != nil {
 		return common.ReturnErrorMsg(c, err.Error())
 	}
@@ -81,18 +66,15 @@ func GetTaskComponent(c echo.Context) error {
 //	@Accept		json
 //	@Produce		json
 //	@Param		tcName path string true "Name of the TaskComponent"
-//	@Success		200	{object}	model.TaskComponent		"Successfully get the task component"
+//	@Success		200	{object}	domain.TaskComponent		"Successfully get the task component"
 //	@Failure		400	{object}	common.ErrorResponse	"Sent bad request."
 //	@Failure		500	{object}	common.ErrorResponse	"Failed to get the task component"
 //	@Router		/task_component/name/{tcName} [get]
 func GetTaskComponentByName(c echo.Context) error {
 	tcName := c.Param("tcName")
-	if tcName == "" {
-		return common.ReturnErrorMsg(c, "tcName is empty")
-	}
-	taskComponent := db.TaskComponentGetByName(tcName)
-	if taskComponent == nil {
-		return common.ReturnErrorMsg(c, "task component not found with the provided name")
+	taskComponent, err := service.GetTaskComponentByName(tcName)
+	if err != nil {
+		return common.ReturnErrorMsg(c, err.Error())
 	}
 	return c.JSONPretty(http.StatusOK, taskComponent, "")
 }
@@ -107,7 +89,7 @@ func GetTaskComponentByName(c echo.Context) error {
 //	@Produce		json
 //	@Param			page query string false "Page of the task component list."
 //	@Param			row query string false "Row of the task component list."
-//	@Success		200	{object}	[]model.TaskComponent	"Successfully get a list of task component."
+//	@Success		200	{object}	[]domain.TaskComponent	"Successfully get a list of task component."
 //	@Failure		400	{object}	common.ErrorResponse	"Sent bad request."
 //	@Failure		500	{object}	common.ErrorResponse	"Failed to get a list of task component."
 //	@Router			/task_component [get]
@@ -117,7 +99,7 @@ func ListTaskComponent(c echo.Context) error {
 		return common.ReturnErrorMsg(c, err.Error())
 	}
 
-	taskComponentList, err := dao.TaskComponentGetList(page, row)
+	taskComponentList, err := service.ListTaskComponent(page, row)
 	if err != nil {
 		return common.ReturnErrorMsg(c, err.Error())
 	}
@@ -134,38 +116,24 @@ func ListTaskComponent(c echo.Context) error {
 //	@Produce		json
 //	@Param		tcId path string true "ID of the TaskComponent"
 //	@Param		TaskComponent body model.CreateTaskComponentReq true "task component to modify."
-//	@Success		200	{object}	model.TaskComponent		"Successfully update the task component"
+//	@Success		200	{object}	domain.TaskComponent		"Successfully update the task component"
 //	@Failure		400	{object}	common.ErrorResponse	"Sent bad request."
 //	@Failure		500	{object}	common.ErrorResponse	"Failed to update the task component"
 //	@Router		/task_component/{tcId} [put]
 func UpdateTaskComponent(c echo.Context) error {
-	taskComponent := new(model.CreateTaskComponentReq)
-	err := c.Bind(taskComponent)
+	updateTaskComponentReq := new(model.CreateTaskComponentReq)
+	err := c.Bind(updateTaskComponentReq)
 	if err != nil {
 		return err
 	}
 
 	tcId := c.Param("tcId")
-	if tcId == "" {
-		return common.ReturnErrorMsg(c, "Please provide the tcId.")
-	}
-	oldTaskComponent, err := dao.TaskComponentGet(tcId)
+	taskComponent, err := service.UpdateTaskComponent(tcId, *updateTaskComponentReq)
 	if err != nil {
 		return common.ReturnErrorMsg(c, err.Error())
 	}
 
-	if taskComponent.Name != "" {
-		oldTaskComponent.Name = taskComponent.Name
-	}
-
-	oldTaskComponent.Data = taskComponent.Data
-
-	err = dao.TaskComponentUpdate(oldTaskComponent)
-	if err != nil {
-		return common.ReturnErrorMsg(c, err.Error())
-	}
-
-	return c.JSONPretty(http.StatusOK, oldTaskComponent, " ")
+	return c.JSONPretty(http.StatusOK, taskComponent, " ")
 }
 
 // DeleteTaskComponent godoc
@@ -183,16 +151,7 @@ func UpdateTaskComponent(c echo.Context) error {
 //	@Router		/task_component/{tcId} [delete]
 func DeleteTaskComponent(c echo.Context) error {
 	tcId := c.Param("tcId")
-	if tcId == "" {
-		return common.ReturnErrorMsg(c, "Please provide the tcId.")
-	}
-
-	taskComponent, err := dao.TaskComponentGet(tcId)
-	if err != nil {
-		return common.ReturnErrorMsg(c, err.Error())
-	}
-
-	err = dao.TaskComponentDelete(taskComponent)
+	err := service.DeleteTaskComponent(tcId)
 	if err != nil {
 		return common.ReturnErrorMsg(c, err.Error())
 	}

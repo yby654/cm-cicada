@@ -3,8 +3,8 @@ package controller
 import (
 	"net/http"
 
-	"github.com/cloud-barista/cm-cicada/lib/cmd"
-	"github.com/cloud-barista/cm-cicada/lib/ssh"
+	"github.com/cloud-barista/cm-cicada/internal/lib/cmd"
+	"github.com/cloud-barista/cm-cicada/internal/lib/ssh"
 	"github.com/cloud-barista/cm-cicada/pkg/api/rest/common"
 	"github.com/cloud-barista/cm-cicada/pkg/api/rest/model"
 	"github.com/labstack/echo/v4"

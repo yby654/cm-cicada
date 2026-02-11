@@ -55,7 +55,8 @@ swag swagger: ## Generate Swagger Documentation
 	@if [ ! -f "${GOPATH}/bin/swag" ] && [ ! -f "$(GOROOT)/bin/swag" ]; then \
 	  ${GO_COMMAND} install github.com/swaggo/swag/cmd/swag@latest; \
 	fi
-	@swag init -g ./pkg/api/rest/server/server.go --pd -o ./pkg/api/rest/docs/ > /dev/null
+	@swag init -g ./pkg/api/rest/server/server.go  -o ./pkg/api/rest/docs/ > /dev/null
+	#@swag init -g ./pkg/api/rest/server/server.go --pd -o ./pkg/api/rest/docs/ > /dev/null
 
 build: lint swag ## Build the binary file
 	@echo Building...
@@ -107,12 +108,29 @@ run: run_airflow ## Run Airflow server and the built binary
 
 run_docker: run_airflow ## Run Airflow server and the built binary within Docker
 	@docker compose up -d
+run_go: ## Run Go binary only (Docker untouched)
+	@echo "Running Go binary only..."
+	@git diff > .diff_current
+	@STATUS=`diff .diff_last_build .diff_current 2>&1 > /dev/null; echo $$?` && \
+	  GIT_HASH_MINE=`git rev-parse HEAD` && \
+	  GIT_HASH_LAST_BUILD=`cat .git_hash_last_build 2>/dev/null || echo ""` && \
+	  if [ "$$STATUS" != "0" ] || [ "$$GIT_HASH_MINE" != "$$GIT_HASH_LAST_BUILD" ]; then \
+	    $(MAKE) build; \
+	  fi
+	@cp -RpPf conf cmd/${MODULE_NAME}/ && \
+	  ./cmd/${MODULE_NAME}/${MODULE_NAME}* || \
+	  (echo "Trying with sudo..." && sudo ./cmd/${MODULE_NAME}/${MODULE_NAME}*) &
+
 
 stop: stop_airflow ## Stop Airflow server and the built binary
 	@sudo killall ${MODULE_NAME} | true
 
 stop_docker: stop_airflow ## Stop the Docker containers
 	@docker compose down
+
+stop_go: ## Stop only Go process
+	@echo "Stopping Go process..."
+	@sudo killall ${MODULE_NAME} 2>/dev/null || true
 
 clean: ## Remove previous build
 	@echo Cleaning build...
