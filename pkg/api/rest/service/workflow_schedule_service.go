@@ -6,13 +6,20 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"gorm.io/gorm"
 
 	"github.com/cloud-barista/cm-cicada/dao"
+	"github.com/cloud-barista/cm-cicada/db"
 	"github.com/cloud-barista/cm-cicada/lib/airflow"
 	"github.com/cloud-barista/cm-cicada/pkg/api/rest/common"
 	"github.com/cloud-barista/cm-cicada/pkg/api/rest/mapper"
 	"github.com/cloud-barista/cm-cicada/pkg/api/rest/model"
 )
+
+// ErrActiveScheduleExists is returned when a workflow already has an active
+// schedule. It is surfaced both by the in-transaction re-check and by the
+// partial unique index (translated gorm.ErrDuplicatedKey).
+var ErrActiveScheduleExists = errors.New("workflow already has an active schedule; cancel it first")
 
 type WorkflowScheduleService struct{}
 
@@ -20,15 +27,9 @@ func NewWorkflowScheduleService() *WorkflowScheduleService {
 	return &WorkflowScheduleService{}
 }
 
-// Schedule registers a scheduled execution. Exactly one of req.RunAt /
-// req.Cron must be set:
-//   - RunAt: one-shot future execution (Airflow schedule="@once" + start_date).
-//   - Cron:  recurring execution (Airflow schedule=<cron>).
-//
-// Only one active schedule per workflow is allowed regardless of type;
-// callers must Cancel the existing one before registering another. After
-// persisting the row the DAG metadata is rewritten so Airflow picks up the
-// new schedule on its next parse cycle.
+// Schedule registers a one-shot (RunAt) or recurring (Cron) schedule.
+// Exactly one of the two must be set. Only one active schedule per workflow
+// is allowed; existing active must be canceled first.
 func (s *WorkflowScheduleService) Schedule(workflowID string, req model.CreateWorkflowScheduleReq) (*model.WorkflowSchedule, error) {
 	if workflowID == "" {
 		return nil, errors.New("please provide the workflow id")
@@ -49,14 +50,6 @@ func (s *WorkflowScheduleService) Schedule(workflowID string, req model.CreateWo
 		return nil, errors.New("workflow not found: " + err.Error())
 	}
 
-	existing, err := dao.WorkflowScheduleGetActive(workflowID)
-	if err != nil {
-		return nil, err
-	}
-	if existing != nil {
-		return nil, errors.New("workflow already has an active schedule; cancel it first (schedule_id=" + existing.ID + ")")
-	}
-
 	row := &model.WorkflowSchedule{
 		ID:         uuid.New().String(),
 		WorkflowID: workflowID,
@@ -75,23 +68,42 @@ func (s *WorkflowScheduleService) Schedule(workflowID string, req model.CreateWo
 		row.Cron = &cron
 	}
 
-	if err := dao.WorkflowScheduleCreate(row); err != nil {
+	// Re-check active uniqueness and insert on the same connection. The
+	// partial unique index (idx_workflow_schedules_active) is the real guard
+	// against the check-then-create race; the in-tx re-check just yields a
+	// friendlier error in the common (non-racing) case.
+	err = db.DB.Transaction(func(tx *gorm.DB) error {
+		existing, err := dao.WorkflowScheduleGetActiveTx(tx, workflowID)
+		if err != nil {
+			return err
+		}
+		if existing != nil {
+			return ErrActiveScheduleExists
+		}
+		return dao.WorkflowScheduleCreateTx(tx, row)
+	})
+	if err != nil {
+		if errors.Is(err, ErrActiveScheduleExists) || errors.Is(err, gorm.ErrDuplicatedKey) {
+			return nil, ErrActiveScheduleExists
+		}
 		return nil, err
 	}
 
+	// DAG refresh is outside the transaction. On failure, compensate by
+	// canceling the just-created schedule so the active-uniqueness invariant
+	// is not left occupied by a schedule the DAG never picked up.
 	if err := s.refreshDAG(workflow); err != nil {
-		// rollback the schedule row so DAG and DB stay consistent
-		_ = dao.WorkflowScheduleUpdateStatus(row.ID, model.WorkflowScheduleStatusCanceled)
+		if cerr := dao.WorkflowScheduleUpdateStatus(row.ID, model.WorkflowScheduleStatusCanceled); cerr != nil {
+			return nil, errors.New(err.Error() + "; additionally failed to roll back the schedule: " + cerr.Error())
+		}
 		return nil, err
 	}
 
 	return row, nil
 }
 
-// Cancel marks the workflow's active schedule as canceled and rewrites the
-// DAG metadata so the schedule line is dropped (DAG becomes manual-trigger
-// only again). Since at most one active schedule per workflow is allowed,
-// identifying the target by workflow id alone is unambiguous.
+// Cancel marks the workflow's active schedule as canceled and drops the
+// schedule line from DAG metadata.
 func (s *WorkflowScheduleService) Cancel(workflowID string) (*model.WorkflowSchedule, error) {
 	if workflowID == "" {
 		return nil, errors.New("please provide the workflow id")
@@ -120,9 +132,7 @@ func (s *WorkflowScheduleService) Cancel(workflowID string) (*model.WorkflowSche
 }
 
 // GetLatest returns the workflow's most recently created schedule row
-// regardless of status (active / executed / canceled), or (nil, nil) when
-// there's no schedule history. Callers branch on .status to interpret the
-// result.
+// regardless of status, or (nil, nil) when there's no schedule history.
 func (s *WorkflowScheduleService) GetLatest(workflowID string) (*model.WorkflowSchedule, error) {
 	if workflowID == "" {
 		return nil, errors.New("please provide the workflow id")
@@ -131,18 +141,11 @@ func (s *WorkflowScheduleService) GetLatest(workflowID string) (*model.WorkflowS
 	return dao.WorkflowScheduleGetLatest(workflowID)
 }
 
-// syncOverdueOnceSchedule promotes the workflow's active one-shot schedule
-// to "executed" when Airflow has already scheduler-triggered it. Matching is
-// strict: only DAGRuns with run_type="scheduled" and logical_date within ±1s
-// of schedule.run_at count — manual triggers and backfills are ignored so a
-// stray POST /run can't flip the schedule.
-//
-// Cron schedules are intentionally left alone: a cron row represents a
-// recurring rule, not a single execution, and stays active until canceled.
-//
-// Called lazily at every schedule API entry point (POST/GET/DELETE) so the
-// system has no background worker. Failures are silent — sync is best-effort
-// and never blocks the actual request.
+// syncOverdueOnceSchedule promotes the active once schedule to executed when
+// a matching scheduler-triggered DAGRun exists. Matching is strict:
+// run_type=="scheduled" and logical_date within ±1s of run_at. Cron rows are
+// not touched (recurring rules stay active). Best-effort: any error silently
+// returns without mutating state.
 func (s *WorkflowScheduleService) syncOverdueOnceSchedule(workflowID string) {
 	row, err := dao.WorkflowScheduleGetActive(workflowID)
 	if err != nil || row == nil {
@@ -189,8 +192,6 @@ func (s *WorkflowScheduleService) syncOverdueOnceSchedule(workflowID string) {
 	}
 }
 
-// refreshDAG re-writes the DAG metadata so gusty.writeDAGMetadata picks up
-// the latest schedule state from DB.
 func (s *WorkflowScheduleService) refreshDAG(workflow *model.Workflow) error {
 	client, err := airflow.GetClient()
 	if err != nil {

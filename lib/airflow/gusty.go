@@ -230,9 +230,6 @@ func ensureWorkflowDir(workflow *model.Workflow) (string, error) {
 }
 
 func writeDAGMetadata(workflow *model.Workflow, dagDir string) error {
-	// DAG 메타데이터(METADATA.yml)를 기록한다.
-	// 워크플로우에 active schedule이 있으면 Airflow가 알아서 1회 실행하도록
-	// schedule="@once", start_date=run_at,  catchup=false 를 함께 기록한다.
 	type defaultArgs struct {
 		Owner         string `yaml:"owner"`
 		StartDate     string `yaml:"start_date"`

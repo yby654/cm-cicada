@@ -22,9 +22,9 @@ type WorkflowGraphDiff struct {
 	TasksToSoftDrop      []model.TaskDBModel
 }
 
-// DataToCreateDataReq strips IDs from a persisted Data graph so it can be fed
-// back into createWorkflowInternal as a fresh CreateDataReq (with new IDs to
-// be issued downstream). Used by the workflow clone path.
+// DataToCreateDataReq strips IDs from a persisted Data graph so the caller
+// can feed it back through CreateDataReqToData to get fresh UUIDs.
+// soft-deleted tasks are excluded.
 func DataToCreateDataReq(data model.Data) model.CreateDataReq {
 	tgs := make([]model.CreateTaskGroupReq, 0, len(data.TaskGroups))
 	for _, tg := range data.TaskGroups {

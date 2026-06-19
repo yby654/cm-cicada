@@ -33,8 +33,15 @@ func ensureWorkflowKey(workflow *model.Workflow) error {
 }
 
 func WorkflowCreate(workflow *model.Workflow) (*model.Workflow, error) {
-	if err := ensureDB(); err != nil {
-		return nil, err
+	return WorkflowCreateTx(db.DB, workflow)
+}
+
+// WorkflowCreateTx is the transaction-aware variant of WorkflowCreate. Pass a
+// *gorm.DB obtained from db.DB.Transaction to participate in that transaction;
+// WorkflowCreate delegates here with the global handle for non-tx callers.
+func WorkflowCreateTx(tx *gorm.DB, workflow *model.Workflow) (*model.Workflow, error) {
+	if tx == nil {
+		return nil, errors.New("database connection is not initialized")
 	}
 
 	now := time.Now()
@@ -47,7 +54,7 @@ func WorkflowCreate(workflow *model.Workflow) (*model.Workflow, error) {
 	workflow.CreatedAt = now
 	workflow.UpdatedAt = now
 
-	result := db.DB.Create(workflow)
+	result := tx.Create(workflow)
 	if result.Error != nil {
 		return nil, result.Error
 	}
@@ -222,8 +229,13 @@ func WorkflowGetListIncludeDeleted(workflow *model.Workflow, page int, row int) 
 }
 
 func WorkflowUpdate(workflow *model.Workflow) error {
-	if err := ensureDB(); err != nil {
-		return err
+	return WorkflowUpdateTx(db.DB, workflow)
+}
+
+// WorkflowUpdateTx is the transaction-aware variant of WorkflowUpdate.
+func WorkflowUpdateTx(tx *gorm.DB, workflow *model.Workflow) error {
+	if tx == nil {
+		return errors.New("database connection is not initialized")
 	}
 
 	if workflow.WorkflowKey == "" {
@@ -231,7 +243,7 @@ func WorkflowUpdate(workflow *model.Workflow) error {
 	}
 
 	workflow.UpdatedAt = time.Now()
-	result := db.DB.Model(&model.Workflow{}).
+	result := tx.Model(&model.Workflow{}).
 		Where("id = ? AND is_deleted = ?", workflow.ID, false).
 		Updates(workflow)
 	return result.Error
@@ -255,22 +267,35 @@ func WorkflowDelete(workflow *model.Workflow) error {
 }
 
 func WorkflowSetCurrentVersion(workflowID string, versionID string) error {
-	if err := ensureDB(); err != nil {
-		return err
+	return WorkflowSetCurrentVersionTx(db.DB, workflowID, versionID)
+}
+
+// WorkflowSetCurrentVersionTx is the transaction-aware variant of
+// WorkflowSetCurrentVersion.
+func WorkflowSetCurrentVersionTx(tx *gorm.DB, workflowID string, versionID string) error {
+	if tx == nil {
+		return errors.New("database connection is not initialized")
 	}
 
-	return db.DB.Model(&model.Workflow{}).
+	return tx.Model(&model.Workflow{}).
 		Where("id = ?", workflowID).
 		Update("current_version_id", versionID).Error
 }
 
 func WorkflowVersionGetLatestVersionNo(workflowID string) (int, error) {
-	if err := ensureDB(); err != nil {
-		return 0, err
+	return WorkflowVersionGetLatestVersionNoTx(db.DB, workflowID)
+}
+
+// WorkflowVersionGetLatestVersionNoTx is the transaction-aware variant; reading
+// the latest version within the same tx keeps version_no monotonic under
+// concurrent snapshot creation.
+func WorkflowVersionGetLatestVersionNoTx(tx *gorm.DB, workflowID string) (int, error) {
+	if tx == nil {
+		return 0, errors.New("database connection is not initialized")
 	}
 
 	latest := &model.WorkflowVersion{}
-	result := db.DB.Where("workflowId = ?", workflowID).
+	result := tx.Where("workflowId = ?", workflowID).
 		Order("version_no DESC").
 		First(latest)
 	if result.Error != nil {
@@ -284,11 +309,18 @@ func WorkflowVersionGetLatestVersionNo(workflowID string) (int, error) {
 }
 
 func WorkflowCreateSnapshot(workflow *model.Workflow, action string, sourceType string, sourceTemplateID string) (*model.WorkflowVersion, error) {
-	if err := ensureDB(); err != nil {
-		return nil, err
+	return WorkflowCreateSnapshotTx(db.DB, workflow, action, sourceType, sourceTemplateID)
+}
+
+// WorkflowCreateSnapshotTx is the transaction-aware variant of
+// WorkflowCreateSnapshot. The version-number read and the current-version
+// update run on the same tx so the snapshot + pointer move atomically.
+func WorkflowCreateSnapshotTx(tx *gorm.DB, workflow *model.Workflow, action string, sourceType string, sourceTemplateID string) (*model.WorkflowVersion, error) {
+	if tx == nil {
+		return nil, errors.New("database connection is not initialized")
 	}
 
-	latestVersionNo, err := WorkflowVersionGetLatestVersionNo(workflow.ID)
+	latestVersionNo, err := WorkflowVersionGetLatestVersionNoTx(tx, workflow.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -305,11 +337,11 @@ func WorkflowCreateSnapshot(workflow *model.Workflow, action string, sourceType 
 		CreatedAt:        time.Now(),
 	}
 
-	if err := db.DB.Create(workflowVersion).Error; err != nil {
+	if err := tx.Create(workflowVersion).Error; err != nil {
 		return nil, err
 	}
 
-	if err := WorkflowSetCurrentVersion(workflow.ID, workflowVersion.ID); err != nil {
+	if err := WorkflowSetCurrentVersionTx(tx, workflow.ID, workflowVersion.ID); err != nil {
 		return nil, err
 	}
 	workflow.CurrentVersionID = workflowVersion.ID
@@ -368,9 +400,7 @@ func WorkflowVersionGet(id string, wkID string) (*model.WorkflowVersion, error) 
 	return workflowVersion, nil
 }
 
-// WorkflowVersionGetByNo looks up a workflow version by its sequential
-// version_no inside a workflow. Returns (nil, nil) when the row does not
-// exist so callers can distinguish "missing" from "error".
+// WorkflowVersionGetByNo returns (nil, nil) when no row matches.
 func WorkflowVersionGetByNo(workflowID string, versionNo int) (*model.WorkflowVersion, error) {
 	if err := ensureDB(); err != nil {
 		return nil, err

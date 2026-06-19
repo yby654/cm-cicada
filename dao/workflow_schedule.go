@@ -9,13 +9,20 @@ import (
 	"github.com/cloud-barista/cm-cicada/pkg/api/rest/model"
 )
 
-// WorkflowScheduleCreate inserts a new workflow_schedules row.
 func WorkflowScheduleCreate(s *model.WorkflowSchedule) error {
-	return db.DB.Create(s).Error
+	return WorkflowScheduleCreateTx(db.DB, s)
 }
 
-// WorkflowScheduleGetByID returns a single schedule row by id, or nil when
-// no row matches (no error in that case).
+// WorkflowScheduleCreateTx is the transaction-aware variant of
+// WorkflowScheduleCreate.
+func WorkflowScheduleCreateTx(tx *gorm.DB, s *model.WorkflowSchedule) error {
+	if tx == nil {
+		return errors.New("database connection is not initialized")
+	}
+	return tx.Create(s).Error
+}
+
+// WorkflowScheduleGetByID returns (nil, nil) when the row does not exist.
 func WorkflowScheduleGetByID(id string) (*model.WorkflowSchedule, error) {
 	var s model.WorkflowSchedule
 	if err := db.DB.Where("id = ?", id).First(&s).Error; err != nil {
@@ -27,8 +34,7 @@ func WorkflowScheduleGetByID(id string) (*model.WorkflowSchedule, error) {
 	return &s, nil
 }
 
-// WorkflowScheduleListByWorkflowID returns every schedule row attached to a
-// workflow, ordered by run_at ascending.
+// WorkflowScheduleListByWorkflowID returns all rows ordered by run_at ASC.
 func WorkflowScheduleListByWorkflowID(workflowID string) ([]model.WorkflowSchedule, error) {
 	var out []model.WorkflowSchedule
 	if err := db.DB.Where("workflow_id = ?", workflowID).
@@ -39,10 +45,8 @@ func WorkflowScheduleListByWorkflowID(workflowID string) ([]model.WorkflowSchedu
 	return out, nil
 }
 
-// WorkflowScheduleGetLatest returns the workflow's most recently created
-// schedule row regardless of status. Used by the GET endpoint so callers
-// can see the last lifecycle state (active / executed / canceled). Returns
-// (nil, nil) when the workflow has no schedule history.
+// WorkflowScheduleGetLatest returns the most recently created row regardless
+// of status, or (nil, nil) when there's no schedule history.
 func WorkflowScheduleGetLatest(workflowID string) (*model.WorkflowSchedule, error) {
 	var s model.WorkflowSchedule
 	err := db.DB.Where("workflow_id = ?", workflowID).
@@ -57,14 +61,22 @@ func WorkflowScheduleGetLatest(workflowID string) (*model.WorkflowSchedule, erro
 	return &s, nil
 }
 
-// WorkflowScheduleGetActive returns the single active schedule for a
-// workflow (the one that drives the DAG metadata), or nil when none exists.
-// Multiple active rows for the same workflow are not expected — service
-// layer guards against creating more than one — but if they exist this
-// returns the earliest run_at.
+// WorkflowScheduleGetActive returns the row that drives DAG metadata, or
+// (nil, nil) when none exists. Picks earliest run_at if multiple actives
+// somehow exist (service guards against that).
 func WorkflowScheduleGetActive(workflowID string) (*model.WorkflowSchedule, error) {
+	return WorkflowScheduleGetActiveTx(db.DB, workflowID)
+}
+
+// WorkflowScheduleGetActiveTx is the transaction-aware variant of
+// WorkflowScheduleGetActive. Used inside the schedule-create transaction to
+// re-check active uniqueness on the same connection as the insert.
+func WorkflowScheduleGetActiveTx(tx *gorm.DB, workflowID string) (*model.WorkflowSchedule, error) {
+	if tx == nil {
+		return nil, errors.New("database connection is not initialized")
+	}
 	var s model.WorkflowSchedule
-	err := db.DB.Where("workflow_id = ? AND status = ?", workflowID, model.WorkflowScheduleStatusActive).
+	err := tx.Where("workflow_id = ? AND status = ?", workflowID, model.WorkflowScheduleStatusActive).
 		Order("run_at ASC").
 		First(&s).Error
 	if err != nil {
@@ -76,7 +88,6 @@ func WorkflowScheduleGetActive(workflowID string) (*model.WorkflowSchedule, erro
 	return &s, nil
 }
 
-// WorkflowScheduleUpdateStatus transitions a schedule row to a new status.
 func WorkflowScheduleUpdateStatus(id string, status model.WorkflowScheduleStatus) error {
 	return db.DB.Model(&model.WorkflowSchedule{}).
 		Where("id = ?", id).

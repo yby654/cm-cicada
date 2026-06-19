@@ -10,8 +10,13 @@ import (
 )
 
 func TaskGroupCreate(taskGroup *model.TaskGroupDBModel) (*model.TaskGroupDBModel, error) {
-	if err := ensureDB(); err != nil {
-		return nil, err
+	return TaskGroupCreateTx(db.DB, taskGroup)
+}
+
+// TaskGroupCreateTx is the transaction-aware variant of TaskGroupCreate.
+func TaskGroupCreateTx(tx *gorm.DB, taskGroup *model.TaskGroupDBModel) (*model.TaskGroupDBModel, error) {
+	if tx == nil {
+		return nil, errors.New("database connection is not initialized")
 	}
 
 	taskGroup.IsDeleted = false
@@ -20,7 +25,7 @@ func TaskGroupCreate(taskGroup *model.TaskGroupDBModel) (*model.TaskGroupDBModel
 		taskGroup.TaskGroupKey = taskGroup.ID
 	}
 
-	result := db.DB.Create(taskGroup)
+	result := tx.Create(taskGroup)
 	if result.Error != nil {
 		return nil, result.Error
 	}
@@ -29,15 +34,20 @@ func TaskGroupCreate(taskGroup *model.TaskGroupDBModel) (*model.TaskGroupDBModel
 }
 
 func TaskGroupSave(taskGroup *model.TaskGroupDBModel) error {
-	if err := ensureDB(); err != nil {
-		return err
+	return TaskGroupSaveTx(db.DB, taskGroup)
+}
+
+// TaskGroupSaveTx is the transaction-aware variant of TaskGroupSave.
+func TaskGroupSaveTx(tx *gorm.DB, taskGroup *model.TaskGroupDBModel) error {
+	if tx == nil {
+		return errors.New("database connection is not initialized")
 	}
 
 	var existing model.TaskGroupDBModel
-	result := db.DB.Unscoped().Where("id = ?", taskGroup.ID).First(&existing)
+	result := tx.Unscoped().Where("id = ?", taskGroup.ID).First(&existing)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
-			_, err := TaskGroupCreate(taskGroup)
+			_, err := TaskGroupCreateTx(tx, taskGroup)
 			return err
 		}
 		return result.Error
@@ -52,7 +62,7 @@ func TaskGroupSave(taskGroup *model.TaskGroupDBModel) error {
 		}
 	}
 
-	return db.DB.Model(&model.TaskGroupDBModel{}).
+	return tx.Model(&model.TaskGroupDBModel{}).
 		Where("id = ?", taskGroup.ID).
 		Updates(taskGroup).Error
 }
@@ -178,12 +188,17 @@ func TaskGroupGetListByWorkflowID(workflowID string, includeDeleted bool) ([]mod
 }
 
 func TaskGroupDelete(taskGroup *model.TaskGroupDBModel) error {
-	if err := ensureDB(); err != nil {
-		return err
+	return TaskGroupDeleteTx(db.DB, taskGroup)
+}
+
+// TaskGroupDeleteTx is the transaction-aware variant of TaskGroupDelete.
+func TaskGroupDeleteTx(tx *gorm.DB, taskGroup *model.TaskGroupDBModel) error {
+	if tx == nil {
+		return errors.New("database connection is not initialized")
 	}
 
 	now := time.Now()
-	return db.DB.Model(&model.TaskGroupDBModel{}).
+	return tx.Model(&model.TaskGroupDBModel{}).
 		Where("id = ? AND is_deleted = ?", taskGroup.ID, false).
 		Updates(map[string]interface{}{
 			"is_deleted": true,

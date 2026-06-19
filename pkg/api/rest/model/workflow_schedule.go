@@ -2,10 +2,8 @@ package model
 
 import "time"
 
-// WorkflowScheduleStatus is the lifecycle state of a WorkflowSchedule row.
-// Transitions: active -> canceled (user cancel) | active -> executed
-// (Airflow ran it; only applies to type="once" — cron schedules stay active
-// until canceled).
+// WorkflowScheduleStatus transitions: active -> canceled or
+// active -> executed (executed applies to once only; cron stays active).
 type WorkflowScheduleStatus string
 
 const (
@@ -14,7 +12,6 @@ const (
 	WorkflowScheduleStatusExecuted WorkflowScheduleStatus = "executed"
 )
 
-// WorkflowScheduleType discriminates one-shot vs recurring schedules.
 type WorkflowScheduleType string
 
 const (
@@ -22,18 +19,9 @@ const (
 	WorkflowScheduleTypeCron WorkflowScheduleType = "cron"
 )
 
-// WorkflowSchedule records a scheduled execution of a workflow. The actual
-// scheduling is delegated to Airflow via DAG metadata — cm-cicada only
-// persists the intent so it survives restarts and is queryable.
-//
-// One of RunAt / Cron is set depending on Type:
-//   - Type="once": RunAt set, Cron nil. Airflow gets schedule="@once" +
-//     start_date=RunAt + catchup=false.
-//   - Type="cron": Cron set, RunAt nil. Airflow gets schedule=<cron> +
-//     catchup=false.
-//
-// At most one row per workflow_id is in active state at a time, regardless
-// of type, because the Airflow DAG only carries a single schedule value.
+// WorkflowSchedule persists the schedule intent; Airflow does the actual
+// triggering via DAG metadata. Exactly one of RunAt / Cron is set per Type.
+// At most one row per workflow_id is in active state at any time.
 type WorkflowSchedule struct {
 	ID         string                 `gorm:"primaryKey;column:id" json:"id"`
 	WorkflowID string                 `gorm:"column:workflow_id;index;not null" json:"workflow_id"`
@@ -49,9 +37,8 @@ func (WorkflowSchedule) TableName() string {
 	return "workflow_schedules"
 }
 
-// CreateWorkflowScheduleReq is the body for POST /workflow/{wfId}/schedule.
-// Exactly one of RunAt / Cron must be provided. RunAt creates a one-shot
-// schedule, Cron creates a recurring schedule.
+// CreateWorkflowScheduleReq is the POST /schedule body. Exactly one of
+// RunAt (one-shot) or Cron (recurring) must be set.
 type CreateWorkflowScheduleReq struct {
 	RunAt *time.Time `json:"run_at,omitempty" mapstructure:"run_at"`
 	Cron  *string    `json:"cron,omitempty" mapstructure:"cron"`

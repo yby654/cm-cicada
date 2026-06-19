@@ -12,8 +12,13 @@ import (
 )
 
 func TaskSnapshotCreate(snapshot *model.TaskSnapshot) (*model.TaskSnapshot, error) {
-	if err := ensureDB(); err != nil {
-		return nil, err
+	return TaskSnapshotCreateTx(db.DB, snapshot)
+}
+
+// TaskSnapshotCreateTx is the transaction-aware variant of TaskSnapshotCreate.
+func TaskSnapshotCreateTx(tx *gorm.DB, snapshot *model.TaskSnapshot) (*model.TaskSnapshot, error) {
+	if tx == nil {
+		return nil, errors.New("database connection is not initialized")
 	}
 
 	if snapshot.ID == "" {
@@ -23,7 +28,7 @@ func TaskSnapshotCreate(snapshot *model.TaskSnapshot) (*model.TaskSnapshot, erro
 		snapshot.CapturedAt = time.Now()
 	}
 
-	if err := db.DB.Create(snapshot).Error; err != nil {
+	if err := tx.Create(snapshot).Error; err != nil {
 		return nil, err
 	}
 
@@ -31,8 +36,14 @@ func TaskSnapshotCreate(snapshot *model.TaskSnapshot) (*model.TaskSnapshot, erro
 }
 
 func TaskSnapshotCreateFromTask(taskDB *model.TaskDBModel, rawTask model.Task, snapshotType string) error {
-	if err := ensureDB(); err != nil {
-		return err
+	return TaskSnapshotCreateFromTaskTx(db.DB, taskDB, rawTask, snapshotType)
+}
+
+// TaskSnapshotCreateFromTaskTx is the transaction-aware variant of
+// TaskSnapshotCreateFromTask.
+func TaskSnapshotCreateFromTaskTx(tx *gorm.DB, taskDB *model.TaskDBModel, rawTask model.Task, snapshotType string) error {
+	if tx == nil {
+		return errors.New("database connection is not initialized")
 	}
 
 	rawJSON, err := json.Marshal(rawTask)
@@ -40,7 +51,7 @@ func TaskSnapshotCreateFromTask(taskDB *model.TaskDBModel, rawTask model.Task, s
 		return err
 	}
 
-	_, err = TaskSnapshotCreate(&model.TaskSnapshot{
+	_, err = TaskSnapshotCreateTx(tx, &model.TaskSnapshot{
 		WorkflowID:   taskDB.WorkflowID,
 		WorkflowKey:  taskDB.WorkflowKey,
 		TaskID:       taskDB.ID,

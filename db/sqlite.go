@@ -14,7 +14,10 @@ var DB *gorm.DB
 
 func Open() error {
 	var err error
-	DB, err = gorm.Open(sqlite.Open(common.RootPath+"/"+common.ModuleName+".db?_journal_mode=WAL&_busy_timeout=10000"), &gorm.Config{})
+	// TranslateError surfaces driver-specific errors as gorm sentinels (e.g.
+	// gorm.ErrDuplicatedKey on a UNIQUE violation) so the service layer can
+	// branch on them without string-matching SQLite messages.
+	DB, err = gorm.Open(sqlite.Open(common.RootPath+"/"+common.ModuleName+".db?_journal_mode=WAL&_busy_timeout=10000"), &gorm.Config{TranslateError: true})
 	if err != nil {
 		logger.Panicln(logger.ERROR, true, err)
 	}
@@ -64,6 +67,11 @@ func Open() error {
 		logger.Panicln(logger.ERROR, true, err)
 	}
 
+	err = ensureWorkflowScheduleActiveUniqueIndex()
+	if err != nil {
+		logger.Panicln(logger.ERROR, true, err)
+	}
+
 	return err
 }
 
@@ -80,6 +88,22 @@ func ensureWorkflowActiveNameUniqueIndex() error {
 		"ON workflows(name COLLATE NOCASE) WHERE is_deleted = 0"
 	if err := DB.Exec(createSQL).Error; err != nil {
 		return fmt.Errorf("failed to enforce active workflow name uniqueness: %w", err)
+	}
+
+	return nil
+}
+
+// ensureWorkflowScheduleActiveUniqueIndex enforces "at most one active
+// schedule per workflow" at the database level via a partial unique index.
+// This closes the check-then-create race in the schedule service that the
+// in-application guard alone cannot (SQLite deferred transactions take the
+// write lock only at first write, so two concurrent inserts can both pass the
+// pre-check). A UNIQUE violation here is mapped to a conflict in the service.
+func ensureWorkflowScheduleActiveUniqueIndex() error {
+	createSQL := "CREATE UNIQUE INDEX IF NOT EXISTS idx_workflow_schedules_active " +
+		"ON workflow_schedules(workflow_id) WHERE status = 'active'"
+	if err := DB.Exec(createSQL).Error; err != nil {
+		return fmt.Errorf("failed to enforce active workflow schedule uniqueness: %w", err)
 	}
 
 	return nil

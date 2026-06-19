@@ -11,8 +11,13 @@ import (
 )
 
 func TaskCreate(task *model.TaskDBModel) (*model.TaskDBModel, error) {
-	if err := ensureDB(); err != nil {
-		return nil, err
+	return TaskCreateTx(db.DB, task)
+}
+
+// TaskCreateTx is the transaction-aware variant of TaskCreate.
+func TaskCreateTx(tx *gorm.DB, task *model.TaskDBModel) (*model.TaskDBModel, error) {
+	if tx == nil {
+		return nil, errors.New("database connection is not initialized")
 	}
 
 	task.IsDeleted = false
@@ -21,7 +26,7 @@ func TaskCreate(task *model.TaskDBModel) (*model.TaskDBModel, error) {
 		task.TaskKey = task.ID
 	}
 
-	result := db.DB.Create(task)
+	result := tx.Create(task)
 	if result.Error != nil {
 		return nil, result.Error
 	}
@@ -30,15 +35,21 @@ func TaskCreate(task *model.TaskDBModel) (*model.TaskDBModel, error) {
 }
 
 func TaskSave(task *model.TaskDBModel) error {
-	if err := ensureDB(); err != nil {
-		return err
+	return TaskSaveTx(db.DB, task)
+}
+
+// TaskSaveTx is the transaction-aware variant of TaskSave. The existence probe
+// and the create/update run on the same tx.
+func TaskSaveTx(tx *gorm.DB, task *model.TaskDBModel) error {
+	if tx == nil {
+		return errors.New("database connection is not initialized")
 	}
 
 	var existing model.TaskDBModel
-	result := db.DB.Unscoped().Where("id = ?", task.ID).First(&existing)
+	result := tx.Unscoped().Where("id = ?", task.ID).First(&existing)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
-			_, err := TaskCreate(task)
+			_, err := TaskCreateTx(tx, task)
 			return err
 		}
 		return result.Error
@@ -53,7 +64,7 @@ func TaskSave(task *model.TaskDBModel) error {
 		}
 	}
 
-	return db.DB.Model(&model.TaskDBModel{}).
+	return tx.Model(&model.TaskDBModel{}).
 		Where("id = ?", task.ID).
 		Updates(task).Error
 }
@@ -354,12 +365,17 @@ func TaskGetListByWorkflowID(workflowID string, includeDeleted bool) ([]model.Ta
 }
 
 func TaskDelete(task *model.TaskDBModel) error {
-	if err := ensureDB(); err != nil {
-		return err
+	return TaskDeleteTx(db.DB, task)
+}
+
+// TaskDeleteTx is the transaction-aware variant of TaskDelete.
+func TaskDeleteTx(tx *gorm.DB, task *model.TaskDBModel) error {
+	if tx == nil {
+		return errors.New("database connection is not initialized")
 	}
 
 	now := time.Now()
-	return db.DB.Model(&model.TaskDBModel{}).
+	return tx.Model(&model.TaskDBModel{}).
 		Where("id = ? AND is_deleted = ?", task.ID, false).
 		Updates(map[string]interface{}{
 			"is_deleted": true,
