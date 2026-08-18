@@ -103,6 +103,22 @@ type TaskClearOption struct {
 	ResetDagRuns    bool `json:"resetDagRuns"`
 }
 
+// TaskGroupRerunOption re-runs whole task groups of a workflow run: every task
+// of the named groups is cleared, so the scheduler runs those groups again and
+// leaves the rest of the run alone.
+//
+// TaskGroups names the groups to re-run, each by ID or by name.
+type TaskGroupRerunOption struct {
+	DryRun     bool     `json:"dryRun"`
+	TaskGroups []string `json:"taskGroups"`
+	// IncludeDownstream extends the re-run to everything that depends on the
+	// named groups. Since a task group boundary is a real edge in the DAG, this
+	// is how a group and every group after it are re-run in one call.
+	IncludeDownstream bool `json:"includeDownstream"`
+	OnlyFailed        bool `json:"onlyFailed"`
+	OnlyRunning       bool `json:"onlyRunning"`
+}
+
 type WorkflowStatus struct {
 	State string `json:"state"`
 	Count int    `json:"count"`

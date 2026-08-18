@@ -32,6 +32,10 @@ func checkWorkflow(workflow *model.Workflow) error {
 		return err
 	}
 
+	if err := validateTaskGroupBoundaries(workflow.Data.TaskGroups); err != nil {
+		return err
+	}
+
 	for _, tg := range workflow.Data.TaskGroups {
 		for _, t := range tg.Tasks {
 			taskComponent := dao.TaskComponentGetByName(t.TaskComponent)
@@ -275,6 +279,7 @@ func writeGustyYAMLs(workflow *model.Workflow) error {
 	}
 
 	taskAirflowIDByName := buildTaskAirflowIDByName(workflow)
+	taskGroupDirNameByName := buildTaskGroupDirNameByName(workflow)
 	expectedTaskGroupDirs := make(map[string]struct{})
 	expectedTaskFilePaths := make(map[string]struct{})
 	for _, tg := range workflow.Data.TaskGroups {
@@ -283,6 +288,7 @@ func writeGustyYAMLs(workflow *model.Workflow) error {
 			dagDir,
 			tg,
 			taskAirflowIDByName,
+			taskGroupDirNameByName,
 			expectedTaskGroupDirs,
 			expectedTaskFilePaths,
 		); err != nil {
@@ -393,31 +399,65 @@ func buildTaskAirflowIDByName(workflow *model.Workflow) map[string]string {
 	return taskAirflowIDByName
 }
 
+// buildTaskGroupDirNameByName maps a task group name to the directory name that
+// gusty turns into the TaskGroup's group_id. Group-level dependencies must be
+// written with these names, since gusty resolves them against sibling levels.
+func buildTaskGroupDirNameByName(workflow *model.Workflow) map[string]string {
+	dirNameByName := make(map[string]string)
+
+	for _, tg := range workflow.Data.TaskGroups {
+		dirNameByName[tg.Name] = taskGroupDirName(tg)
+	}
+
+	return dirNameByName
+}
+
+// taskGroupMetadata is a task group's METADATA.yml, read by gusty when it turns
+// the directory into an Airflow TaskGroup.
+type taskGroupMetadata struct {
+	Tooltip         string   `yaml:"tooltip"`
+	TaskDisplayName string   `yaml:"task_display_name"`
+	PrefixGroupID   bool     `yaml:"prefix_group_id"`
+	Dependencies    []string `yaml:"dependencies,omitempty"`
+}
+
+func buildTaskGroupMetadata(tg model.TaskGroup, taskGroupDirNameByName map[string]string) taskGroupMetadata {
+	return taskGroupMetadata{
+		Tooltip:         tg.Description,
+		TaskDisplayName: tg.Name,
+		// prefix_group_id는 항상 false로 고정한다. true가 되면 gusty가 실제
+		// task_id 앞에 group_id를 붙여서 XCom 참조(xcom_task)와
+		// findTaskByAirflowTaskID의 조회 키가 동시에 깨진다.
+		PrefixGroupID: false,
+		Dependencies:  resolveDependencies(tg.Dependencies, taskGroupDirNameByName),
+	}
+}
+
+func taskGroupDirName(tg model.TaskGroup) string {
+	if tg.ID != "" {
+		return tg.ID
+	}
+	return tg.Name
+}
+
 func writeTaskGroupYAML(
 	workflow *model.Workflow,
 	dagDir string,
 	tg model.TaskGroup,
 	taskAirflowIDByName map[string]string,
+	taskGroupDirNameByName map[string]string,
 	expectedTaskGroupDirs map[string]struct{},
 	expectedTaskFilePaths map[string]struct{},
 ) error {
 	// TaskGroup 메타데이터와 각 Task YAML을 생성한다.
-	tgDirName := tg.ID
-	if tgDirName == "" {
-		tgDirName = tg.Name
-	}
+	tgDirName := taskGroupDirName(tg)
 	tgDir := filepath.Clean(filepath.Join(dagDir, tgDirName))
 	expectedTaskGroupDirs[filepath.Clean(tgDir)] = struct{}{}
 	if err := fileutil.CreateDirIfNotExist(tgDir); err != nil {
 		return err
 	}
 
-	var taskGroupMeta struct {
-		Tooltip         string `yaml:"tooltip"`
-		TaskDisplayName string `yaml:"task_display_name"`
-	}
-	taskGroupMeta.Tooltip = tg.Description
-	taskGroupMeta.TaskDisplayName = tg.Name
+	taskGroupMeta := buildTaskGroupMetadata(tg, taskGroupDirNameByName)
 
 	metadataPath := filepath.Join(tgDir, "METADATA.yml")
 	if err := writeModelToYAMLFile(taskGroupMeta, metadataPath); err != nil {
@@ -448,20 +488,19 @@ func writeTaskYAML(
 
 	taskOptions["dependencies"] = resolveDependencies(t.Dependencies, taskAirflowIDByName)
 
-	if taskID, exists := taskAirflowIDByName[t.Name]; exists {
-		taskOptions["task_id"] = taskID
-	} else {
-		taskOptions["task_id"] = t.Name
-	}
+	taskAirflowID := resolveAirflowID(t.Name, taskAirflowIDByName)
+	taskOptions["task_id"] = taskAirflowID
 	if t.Name != "" {
 		taskOptions["task_display_name"] = t.Name
 	}
 
-	taskFileName := t.ID
-	if taskFileName == "" {
-		taskFileName = t.Name
-	}
-	filePath := filepath.Clean(filepath.Join(tgDir, taskFileName+".yml"))
+	// The file name has to be the Airflow task_id, not just any identifier of
+	// this task: gusty overwrites the task_id of every spec with the file's base
+	// name (gusty/parsing/__init__.py), while dependencies elsewhere in the DAG
+	// were resolved through taskAirflowIDByName. Naming the file from a second
+	// source lets the two drift apart, and a dependency that names the other one
+	// resolves to nothing at all — gusty drops unknown dependencies silently.
+	filePath := filepath.Clean(filepath.Join(tgDir, taskAirflowID+".yml"))
 	expectedTaskFilePaths[filepath.Clean(filePath)] = struct{}{}
 
 	if err := writeModelToYAMLFile(taskOptions, filePath); err != nil {
@@ -680,15 +719,22 @@ func specString(s model.Spec, key string) string {
 	return fmt.Sprint(v)
 }
 
-func resolveDependencies(dependencies []string, taskAirflowIDByName map[string]string) []string {
-	// 의존성 이름을 Airflow task_id로 치환한다.
+// resolveAirflowID maps a task or task group name to the identifier that ends up
+// in the DAG. Dependencies and the identifier of the thing they point at must go
+// through this same function, or they resolve to different strings and gusty
+// drops the edge without a word.
+func resolveAirflowID(name string, airflowIDByName map[string]string) string {
+	if airflowID := airflowIDByName[name]; airflowID != "" {
+		return airflowID
+	}
+	return name
+}
+
+func resolveDependencies(dependencies []string, airflowIDByName map[string]string) []string {
+	// 의존성 이름을 Airflow task_id(또는 task group id)로 치환한다.
 	resolved := make([]string, 0, len(dependencies))
 	for _, dep := range dependencies {
-		if depID, exists := taskAirflowIDByName[dep]; exists {
-			resolved = append(resolved, depID)
-		} else {
-			resolved = append(resolved, dep)
-		}
+		resolved = append(resolved, resolveAirflowID(dep, airflowIDByName))
 	}
 	return resolved
 }

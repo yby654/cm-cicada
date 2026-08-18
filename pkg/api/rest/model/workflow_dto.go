@@ -45,25 +45,32 @@ type CreateTaskReq struct {
 	Dependencies  []string `json:"dependencies" mapstructure:"dependencies"`
 }
 
+// TaskGroup is a workflow section. Dependencies holds the names of the task
+// groups that must finish before this group starts; they become the group's
+// upstream edges in Airflow (TaskGroup.set_upstream), so the group gets a real
+// entry/exit boundary instead of task-to-task edges crossing it.
 type TaskGroup struct {
-	ID          string `gorm:"primaryKey" json:"id" mapstructure:"id" validate:"required"`
-	Name        string `json:"name" mapstructure:"name" validate:"required"`
-	Description string `json:"description" mapstructure:"description"`
-	Tasks       []Task `json:"tasks" mapstructure:"tasks" validate:"required"`
+	ID           string   `gorm:"primaryKey" json:"id" mapstructure:"id" validate:"required"`
+	Name         string   `json:"name" mapstructure:"name" validate:"required"`
+	Description  string   `json:"description" mapstructure:"description"`
+	Dependencies []string `json:"dependencies" mapstructure:"dependencies"`
+	Tasks        []Task   `json:"tasks" mapstructure:"tasks" validate:"required"`
 }
 
 type TaskGroupDirectly struct {
-	ID          string `json:"id" mapstructure:"id" validate:"required"`
-	WorkflowID  string `json:"workflow_id" mapstructure:"workflow_id" validate:"required"`
-	Name        string `json:"name" mapstructure:"name" validate:"required"`
-	Description string `json:"description" mapstructure:"description"`
-	Tasks       []Task `json:"tasks" mapstructure:"tasks" validate:"required"`
+	ID           string   `json:"id" mapstructure:"id" validate:"required"`
+	WorkflowID   string   `json:"workflow_id" mapstructure:"workflow_id" validate:"required"`
+	Name         string   `json:"name" mapstructure:"name" validate:"required"`
+	Description  string   `json:"description" mapstructure:"description"`
+	Dependencies []string `json:"dependencies" mapstructure:"dependencies"`
+	Tasks        []Task   `json:"tasks" mapstructure:"tasks" validate:"required"`
 }
 
 type CreateTaskGroupReq struct {
-	Name        string          `json:"name" mapstructure:"name" validate:"required"`
-	Description string          `json:"description" mapstructure:"description"`
-	Tasks       []CreateTaskReq `json:"tasks" mapstructure:"tasks" validate:"required"`
+	Name         string          `json:"name" mapstructure:"name" validate:"required"`
+	Description  string          `json:"description" mapstructure:"description"`
+	Dependencies []string        `json:"dependencies" mapstructure:"dependencies"`
+	Tasks        []CreateTaskReq `json:"tasks" mapstructure:"tasks" validate:"required"`
 }
 
 // Data is the graph container serialized into the `data` column of the

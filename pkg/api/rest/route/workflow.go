@@ -9,41 +9,52 @@ import (
 )
 
 func Workflow(e *echo.Echo) {
-	e.POST("/"+strings.ToLower(common.ShortModuleName)+"/workflow", controller.CreateWorkflow)
-	e.GET("/"+strings.ToLower(common.ShortModuleName)+"/workflow/:wfId", controller.GetWorkflow)
-	e.GET("/"+strings.ToLower(common.ShortModuleName)+"/workflow/name/:wfName", controller.GetWorkflowByName)
-	e.GET("/"+strings.ToLower(common.ShortModuleName)+"/workflow", controller.ListWorkflow)
-	e.PUT("/"+strings.ToLower(common.ShortModuleName)+"/workflow/:wfId", controller.UpdateWorkflow)
-	e.POST("/"+strings.ToLower(common.ShortModuleName)+"/workflow/:wfId/run", controller.RunWorkflow)
-	e.POST("/"+strings.ToLower(common.ShortModuleName)+"/workflow/:wfId/clone", controller.CloneWorkflow)
-	e.POST("/"+strings.ToLower(common.ShortModuleName)+"/workflow/:wfId/schedule", controller.ScheduleWorkflow)
-	e.GET("/"+strings.ToLower(common.ShortModuleName)+"/workflow/:wfId/schedule", controller.GetWorkflowSchedule)
-	e.DELETE("/"+strings.ToLower(common.ShortModuleName)+"/workflow/:wfId/schedule", controller.CancelWorkflowSchedule)
-	e.DELETE("/"+strings.ToLower(common.ShortModuleName)+"/workflow/:wfId", controller.DeleteWorkflow)
+	api := e.Group("/" + strings.ToLower(common.ShortModuleName))
 
-	e.GET("/"+strings.ToLower(common.ShortModuleName)+"/workflow/:wfId/task_group", controller.ListTaskGroup)
-	e.GET("/"+strings.ToLower(common.ShortModuleName)+"/workflow/:wfId/task_group/:tgId", controller.GetTaskGroup)
-	e.GET("/"+strings.ToLower(common.ShortModuleName)+"/workflow/:wfId/task_group/:tgId/task", controller.ListTaskFromTaskGroup)
-	e.GET("/"+strings.ToLower(common.ShortModuleName)+"/workflow/:wfId/task_group/:tgId/task/:taskId", controller.GetTaskFromTaskGroup)
+	// Workflow
+	api.POST("/workflow", controller.CreateWorkflow)
+	api.GET("/workflow", controller.ListWorkflow)
+	api.GET("/workflow/:wfId", controller.GetWorkflow)
+	api.PUT("/workflow/:wfId", controller.UpdateWorkflow)
+	api.DELETE("/workflow/:wfId", controller.DeleteWorkflow)
+	api.GET("/workflow/name/:wfName", controller.GetWorkflowByName)
+	api.POST("/workflow/:wfId/clone", controller.CloneWorkflow)
 
-	e.GET("/"+strings.ToLower(common.ShortModuleName)+"/workflow/:wfId/task", controller.ListTask)
+	// Workflow version
+	api.GET("/workflow/:wfId/version", controller.ListWorkflowVersion)
+	api.GET("/workflow/:wfId/version/:verId", controller.GetWorkflowVersion)
+	api.POST("/workflow/:wfId/version/:versionNo/rollback", controller.RollbackWorkflow)
 
-	e.GET("/"+strings.ToLower(common.ShortModuleName)+"/workflow/:wfId/task/:taskId", controller.GetTask)
+	// Task group and task
+	api.GET("/workflow/:wfId/task_group", controller.ListTaskGroup)
+	api.GET("/workflow/:wfId/task_group/:tgId", controller.GetTaskGroup)
+	api.GET("/workflow/:wfId/task_group/:tgId/task", controller.ListTaskFromTaskGroup)
+	api.GET("/workflow/:wfId/task_group/:tgId/task/:taskId", controller.GetTaskFromTaskGroup)
+	api.GET("/workflow/:wfId/task", controller.ListTask)
+	api.GET("/workflow/:wfId/task/:taskId", controller.GetTask)
+	api.GET("/task_group/:tgId", controller.GetTaskGroupDirectly)
+	api.GET("/task/:taskId", controller.GetTaskDirectly)
 
-	e.GET("/"+strings.ToLower(common.ShortModuleName)+"/task_group/:tgId", controller.GetTaskGroupDirectly)
-	e.GET("/"+strings.ToLower(common.ShortModuleName)+"/task/:taskId", controller.GetTaskDirectly)
-	e.GET("/"+strings.ToLower(common.ShortModuleName)+"/workflow/:wfId/workflowRun/:wfRunId/task/:taskId/taskTryNum/:taskTryNum/logs", controller.GetTaskLogs)
-	e.GET("/"+strings.ToLower(common.ShortModuleName)+"/workflow/:wfId/workflowRun/:wfRunId/task/:taskId/taskTryNum/:taskTryNum/logs/download", controller.GetTaskLogDownload)
-	e.GET("/"+strings.ToLower(common.ShortModuleName)+"/workflow/:wfId/runs", controller.GetWorkflowRuns)
-	e.GET("/"+strings.ToLower(common.ShortModuleName)+"/workflow/:wfId/workflowRun/:wfRunId/taskInstances", controller.GetTaskInstances)
-	e.POST("/"+strings.ToLower(common.ShortModuleName)+"/workflow/:wfId/workflowRun/:wfRunId/range", controller.ClearTaskInstances)
-	e.GET("/"+strings.ToLower(common.ShortModuleName)+"/workflow/:wfId/eventlogs", controller.GetEventLogs)
-	e.GET("/"+strings.ToLower(common.ShortModuleName)+"/importErrors", controller.GetImportErrors)
-	e.GET("/"+strings.ToLower(common.ShortModuleName)+"/workflow/:wfId/version", controller.ListWorkflowVersion)
-	e.GET("/"+strings.ToLower(common.ShortModuleName)+"/workflow/:wfId/version/:verId", controller.GetWorkflowVersion)
-	e.POST("/"+strings.ToLower(common.ShortModuleName)+"/workflow/:wfId/version/:versionNo/rollback", controller.RollbackWorkflow)
-	e.GET("/"+strings.ToLower(common.ShortModuleName)+"/workflow/:wfId/status", controller.GetWorkflowStatus)
+	// Scheduling
+	api.POST("/workflow/:wfId/schedule", controller.ScheduleWorkflow)
+	api.GET("/workflow/:wfId/schedule", controller.GetWorkflowSchedule)
+	api.DELETE("/workflow/:wfId/schedule", controller.CancelWorkflowSchedule)
 
-	e.POST("/"+strings.ToLower(common.ShortModuleName)+"/run_script", controller.RunScript)
-	e.POST("/"+strings.ToLower(common.ShortModuleName)+"/sleep_time", controller.SleepTime)
+	// Execution
+	api.POST("/workflow/:wfId/run", controller.RunWorkflow)
+	api.GET("/workflow/:wfId/status", controller.GetWorkflowStatus)
+	api.GET("/workflow/:wfId/runs", controller.GetWorkflowRuns)
+	api.GET("/workflow/:wfId/workflowRun/:wfRunId/taskInstances", controller.GetTaskInstances)
+	api.POST("/workflow/:wfId/workflowRun/:wfRunId/range", controller.ClearTaskInstances)
+	api.POST("/workflow/:wfId/workflowRun/:wfRunId/task_group_range", controller.RerunTaskGroups)
+
+	// Logs
+	api.GET("/workflow/:wfId/workflowRun/:wfRunId/task/:taskId/taskTryNum/:taskTryNum/logs", controller.GetTaskLogs)
+	api.GET("/workflow/:wfId/workflowRun/:wfRunId/task/:taskId/taskTryNum/:taskTryNum/logs/download", controller.GetTaskLogDownload)
+	api.GET("/workflow/:wfId/eventlogs", controller.GetEventLogs)
+	api.GET("/importErrors", controller.GetImportErrors)
+
+	// Utilities
+	api.POST("/run_script", controller.RunScript)
+	api.POST("/sleep_time", controller.SleepTime)
 }

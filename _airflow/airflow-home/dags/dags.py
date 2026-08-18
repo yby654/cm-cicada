@@ -22,7 +22,11 @@ for dag_directory in dag_directories:
     dag_id = os.path.basename(dag_directory)
     globals()[dag_id] = create_dag(dag_directory,
                                    tags = ['default', 'tags'],
-                                   task_group_defaults={"tooltip": "default tooltip"},
+                                   # prefix_group_id must stay False: when gusty prefixes task_ids with
+                                   # the group_id, cm-cicada's xcom_task references and task lookups by
+                                   # Airflow task_id no longer resolve.
+                                   task_group_defaults={"tooltip": "default tooltip",
+                                                        "prefix_group_id": False},
                                    wait_for_defaults={"retries": 10, "check_existence": True},
                                    latest_only=False)
 

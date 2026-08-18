@@ -403,6 +403,68 @@ func (s *WorkflowRuntimeService) ClearTaskInstances(wfID, wfRunID string, option
 	return refs, nil
 }
 
+// RerunTaskGroups re-runs whole task groups of a workflow run. Clearing the
+// tasks of the named groups is what makes the scheduler run them again; every
+// other group keeps the state it already has, so the rest of the run is left
+// untouched.
+func (s *WorkflowRuntimeService) RerunTaskGroups(wfID, wfRunID string, option model.TaskGroupRerunOption) ([]model.TaskInstanceReference, error) {
+	workflow, err := mapper.GetWorkflowFromDB(wfID)
+	if err != nil {
+		return nil, err
+	}
+
+	taskIDs := make([]string, 0)
+	added := make(map[string]struct{})
+	for _, taskGroupRef := range option.TaskGroups {
+		taskGroup, err := findTaskGroup(workflow, taskGroupRef)
+		if err != nil {
+			return nil, err
+		}
+
+		for _, t := range taskGroup.Tasks {
+			if t.IsDeletedTask {
+				continue
+			}
+			if _, exists := added[t.ID]; exists {
+				continue
+			}
+			added[t.ID] = struct{}{}
+			taskIDs = append(taskIDs, t.ID)
+		}
+	}
+	if len(taskIDs) == 0 {
+		return nil, errors.New("the given task groups hold no task to re-run")
+	}
+
+	return s.ClearTaskInstances(wfID, wfRunID, model.TaskClearOption{
+		DryRun:  option.DryRun,
+		TaskIds: taskIDs,
+		// The groups name every task to re-run outright, so pulling in upstream
+		// tasks would re-run more than was asked for.
+		IncludeUpstream:   false,
+		IncludeDownstream: option.IncludeDownstream,
+		OnlyFailed:        option.OnlyFailed,
+		OnlyRunning:       option.OnlyRunning,
+		// Clearing a task only resets the task; a run that already reached
+		// success or failed is never looked at by the scheduler again, so the
+		// cleared tasks would sit at no state forever. Putting the run back to
+		// running is part of what re-running means, not a separate choice — the
+		// Clear button of the Airflow UI does the same.
+		ResetDagRuns: !option.DryRun,
+	})
+}
+
+// findTaskGroup looks a task group up by its ID or by its name.
+func findTaskGroup(workflow *model.Workflow, taskGroupRef string) (*model.TaskGroup, error) {
+	for i, tg := range workflow.Data.TaskGroups {
+		if tg.ID == taskGroupRef || tg.Name == taskGroupRef {
+			return &workflow.Data.TaskGroups[i], nil
+		}
+	}
+
+	return nil, errors.New("task group '" + taskGroupRef + "' not found in the workflow")
+}
+
 func (s *WorkflowRuntimeService) findTaskByAirflowTaskID(workflow *model.Workflow, airflowTaskID string) (*model.TaskDBModel, bool, error) {
 	taskDBInfo, err := dao.TaskGetByWorkflowIDAndTaskKey(workflow.ID, airflowTaskID)
 	if err != nil {

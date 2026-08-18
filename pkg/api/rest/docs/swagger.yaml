@@ -91,6 +91,10 @@ definitions:
     type: object
   github_com_cloud-barista_cm-cicada_pkg_api_rest_model.CreateTaskGroupReq:
     properties:
+      dependencies:
+        items:
+          type: string
+        type: array
       description:
         type: string
       name:
@@ -336,6 +340,10 @@ definitions:
     type: object
   github_com_cloud-barista_cm-cicada_pkg_api_rest_model.TaskGroup:
     properties:
+      dependencies:
+        items:
+          type: string
+        type: array
       description:
         type: string
       id:
@@ -350,6 +358,25 @@ definitions:
     - id
     - name
     - tasks
+    type: object
+  github_com_cloud-barista_cm-cicada_pkg_api_rest_model.TaskGroupRerunOption:
+    properties:
+      dryRun:
+        type: boolean
+      includeDownstream:
+        description: |-
+          IncludeDownstream extends the re-run to everything that depends on the
+          named groups. Since a task group boundary is a real edge in the DAG, this
+          is how a group and every group after it are re-run in one call.
+        type: boolean
+      onlyFailed:
+        type: boolean
+      onlyRunning:
+        type: boolean
+      taskGroups:
+        items:
+          type: string
+        type: array
     type: object
   github_com_cloud-barista_cm-cicada_pkg_api_rest_model.TaskInstance:
     properties:
@@ -2060,6 +2087,54 @@ paths:
           schema:
             $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse'
       summary: Download Task Logs
+      tags:
+      - '[Workflow Execution]'
+  /workflow/{wfId}/workflowRun/{wfRunId}/task_group_range:
+    post:
+      consumes:
+      - application/json
+      description: Re-run whole task groups of a workflow run. Every task of the named
+        groups is cleared, so the scheduler runs those groups again while the rest
+        of the run keeps its state. Each entry of taskGroups takes a task group ID
+        or name. Pass includeDownstream to re-run everything that depends on them
+        as well, which re-runs a group and every group after it. A run that already
+        finished is moved back to running, so the groups really do run again. Pass
+        dryRun to get the list of tasks that would be re-run without touching the
+        run.
+      operationId: rerun-task-groups
+      parameters:
+      - description: DB workflow ID.
+        in: path
+        name: wfId
+        required: true
+        type: string
+      - description: ID of the wfRunId.
+        in: path
+        name: wfRunId
+        required: true
+        type: string
+      - description: Task groups to re-run
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.TaskGroupRerunOption'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully cleared the task groups.
+          schema:
+            $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.TaskInstanceReference'
+        "400":
+          description: Sent bad request.
+          schema:
+            $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse'
+        "500":
+          description: Failed to clear the task groups.
+          schema:
+            $ref: '#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse'
+      summary: Rerun Task Groups
       tags:
       - '[Workflow Execution]'
   /workflow/{wfId}/workflowRun/{wfRunId}/taskInstances:

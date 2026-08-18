@@ -63,3 +63,18 @@ func ValidateTaskClearOptions(opt model.TaskClearOption) error {
 
 	return nil
 }
+
+func ValidateTaskGroupRerunOptions(opt model.TaskGroupRerunOption) error {
+	// 재실행할 task group을 최소 하나는 지정해야 함
+	// (비우면 워크플로우 전체이며, 이는 기존 clear API의 역할)
+	if len(opt.TaskGroups) == 0 {
+		return errors.New("taskGroups에 재실행할 task group을 최소 하나는 지정해야 합니다")
+	}
+
+	// only_failed 와 only_running 은 동시에 true면 안 됨
+	if opt.OnlyFailed && opt.OnlyRunning {
+		return errors.New("only_failed와 only_running은 동시에 true일 수 없습니다")
+	}
+
+	return nil
+}

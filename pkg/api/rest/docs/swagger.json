@@ -2330,6 +2330,67 @@
                 }
             }
         },
+        "/workflow/{wfId}/workflowRun/{wfRunId}/task_group_range": {
+            "post": {
+                "description": "Re-run whole task groups of a workflow run. Every task of the named groups is cleared, so the scheduler runs those groups again while the rest of the run keeps its state. Each entry of taskGroups takes a task group ID or name. Pass includeDownstream to re-run everything that depends on them as well, which re-runs a group and every group after it. A run that already finished is moved back to running, so the groups really do run again. Pass dryRun to get the list of tasks that would be re-run without touching the run.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "[Workflow Execution]"
+                ],
+                "summary": "Rerun Task Groups",
+                "operationId": "rerun-task-groups",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "DB workflow ID.",
+                        "name": "wfId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "ID of the wfRunId.",
+                        "name": "wfRunId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Task groups to re-run",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.TaskGroupRerunOption"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successfully cleared the task groups.",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.TaskInstanceReference"
+                        }
+                    },
+                    "400": {
+                        "description": "Sent bad request.",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Failed to clear the task groups.",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_common.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/workflow_template": {
             "get": {
                 "description": "Get a list of workflow template.",
@@ -2623,6 +2684,12 @@
                 "tasks"
             ],
             "properties": {
+                "dependencies": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
                 "description": {
                     "type": "string"
                 },
@@ -2984,6 +3051,12 @@
                 "tasks"
             ],
             "properties": {
+                "dependencies": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
                 "description": {
                     "type": "string"
                 },
@@ -2997,6 +3070,30 @@
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/github_com_cloud-barista_cm-cicada_pkg_api_rest_model.Task"
+                    }
+                }
+            }
+        },
+        "github_com_cloud-barista_cm-cicada_pkg_api_rest_model.TaskGroupRerunOption": {
+            "type": "object",
+            "properties": {
+                "dryRun": {
+                    "type": "boolean"
+                },
+                "includeDownstream": {
+                    "description": "IncludeDownstream extends the re-run to everything that depends on the\nnamed groups. Since a task group boundary is a real edge in the DAG, this\nis how a group and every group after it are re-run in one call.",
+                    "type": "boolean"
+                },
+                "onlyFailed": {
+                    "type": "boolean"
+                },
+                "onlyRunning": {
+                    "type": "boolean"
+                },
+                "taskGroups": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
                     }
                 }
             }

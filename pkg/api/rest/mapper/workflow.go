@@ -41,9 +41,10 @@ func DataToCreateDataReq(data model.Data) model.CreateDataReq {
 			})
 		}
 		tgs = append(tgs, model.CreateTaskGroupReq{
-			Name:        tg.Name,
-			Description: tg.Description,
-			Tasks:       tasks,
+			Name:         tg.Name,
+			Description:  tg.Description,
+			Dependencies: tg.Dependencies,
+			Tasks:        tasks,
 		})
 	}
 	return model.CreateDataReq{
@@ -88,10 +89,11 @@ func CreateDataReqToData(specVersion string, createDataReq model.CreateDataReq) 
 
 				allTasks = append(allTasks, tasks...)
 				taskGroups = append(taskGroups, model.TaskGroup{
-					ID:          uuid.New().String(),
-					Name:        tgReq.Name,
-					Description: tgReq.Description,
-					Tasks:       tasks,
+					ID:           uuid.New().String(),
+					Name:         tgReq.Name,
+					Description:  tgReq.Description,
+					Dependencies: tgReq.Dependencies,
+					Tasks:        tasks,
 				})
 			}
 
@@ -179,9 +181,14 @@ func BuildWorkflowGraphDiff(workflow *model.Workflow, incoming model.Data) (*Wor
 		resolvedTG := incomingTG
 		taskGroupModel, exists := taskGroupByName[incomingTG.Name]
 		if !exists {
+			// The key must equal the ID: the ID is what becomes the task group
+			// directory name, and gusty derives the Airflow group_id from that
+			// directory. Handing out a second UUID here makes the key name a
+			// group that does not exist in the DAG.
+			taskGroupID := uuid.New().String()
 			taskGroupModel = model.TaskGroupDBModel{
-				ID:           uuid.New().String(),
-				TaskGroupKey: uuid.New().String(),
+				ID:           taskGroupID,
+				TaskGroupKey: taskGroupID,
 			}
 		}
 		if taskGroupModel.TaskGroupKey == "" {
@@ -201,9 +208,15 @@ func BuildWorkflowGraphDiff(workflow *model.Workflow, incoming model.Data) (*Wor
 			resolvedTask := incomingTask
 			taskModel, exists := taskByName[incomingTask.Name]
 			if !exists {
+				// Same rule as the task group above: gusty overwrites the
+				// task_id in every spec with the YAML file name, and that file
+				// is named after the task ID. A TaskKey that differs from the
+				// ID would be written into the dependencies of other tasks and
+				// silently resolve to nothing.
+				taskID := uuid.New().String()
 				taskModel = model.TaskDBModel{
-					ID:      uuid.New().String(),
-					TaskKey: uuid.New().String(),
+					ID:      taskID,
+					TaskKey: taskID,
 				}
 			}
 			if taskModel.TaskKey == "" {
